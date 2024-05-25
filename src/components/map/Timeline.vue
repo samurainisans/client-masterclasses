@@ -1,6 +1,7 @@
 <!-- Timeline.vue -->
 <script setup lang="ts">
 import { ref, watch } from 'vue';
+import SelectComponent from '@/components/ui/SelectComponent.vue';
 
 const props = defineProps<{
   startDate?: Date,
@@ -13,7 +14,7 @@ const emit = defineEmits<{
 
 const intervals = ['день', 'неделя', 'месяц'];
 const modes = ['точный период', 'накопительно'];
-const selectedInterval = ref('неделя');
+const selectedInterval = ref(intervals[1]);
 const selectedMode = ref(modes[0]);
 const value = ref(0);
 const maxRange = ref(0);
@@ -46,7 +47,6 @@ function handleChange(event: Event) {
   updateSliderBackground(newValue);
 }
 
-
 function getCurrentIntervalMilliseconds() {
   switch (selectedInterval.value) {
     case 'день':
@@ -68,23 +68,14 @@ function updateSliderBackground(value: number) {
 <template>
   <div class="timeline">
     <div class="timeline__controls">
-      <div class="custom-select">
-        <select v-model="selectedInterval" class="timeline__select">
-          <option v-for="interval in intervals" :key="interval">{{ interval }}</option>
-        </select>
-      </div>
-      <div class="custom-select">
-        <select v-model="selectedMode" class="timeline__select">
-          <option v-for="mode in modes" :key="mode">{{ mode }}</option>
-        </select>
-      </div>
+      <SelectComponent :options="intervals" v-model="selectedInterval" />
+      <SelectComponent :options="modes" v-model="selectedMode" />
     </div>
     <div class="timeline__slider">
       <input type="range" :min="0" :max="maxRange" v-model="value" @input="handleChange" class="timeline__input-range"/>
     </div>
   </div>
 </template>
-
 
 <style scoped lang="scss">
 @import "@/assets/variables";
