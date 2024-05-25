@@ -1,12 +1,16 @@
-<!-- src/components/map/Maps.vue -->
 <template>
   <div class="main-container">
-    <LayerToggleButton :displayed-master-classes="displayedMasterClasses" :my-icon="myIcon" />
+    <Nav />
+    <!-- <LayerToggleButton :displayed-master-classes="displayedMasterClasses" :my-icon="myIcon" /> -->
     <ListViewMasterClasses class="list-view" />
     <div id="map" class="maps-container"></div>
     <div class="controls-container">
       <Timeline :start-date="earliestDate" :end-date="latestDate" @changeData="handleDataChange" class="timeline" />
       <button class="button button--small show-all-btn" @click="showAll">показать всё</button>
+    </div>
+    <div class="zoom-controls">
+      <button class="zoom-in" @click="zoomIn">+</button>
+      <button class="zoom-out" @click="zoomOut">-</button>
     </div>
   </div>
 </template>
@@ -18,7 +22,7 @@ import { computed, onMounted, ref } from "vue";
 import { useLayersStore } from "@/stores/layersStore";
 import ListViewMasterClasses from "@/components/map/ListViewMasterClasses.vue";
 import Timeline from "@/components/map/Timeline.vue";
-import LayerToggleButton from "@/components/map/LayerToggleButton.vue";
+import Nav from "@/components/ui/Nav.vue";
 
 const store = useMasterClassesStore();
 const layersStore = useLayersStore();
@@ -43,6 +47,8 @@ const earliestDate = computed(() => {
 const latestDate = computed(() => {
   return store.masterClasses.reduce((max, mc) => new Date(mc.start_time) > max ? new Date(mc.start_time) : max, new Date());
 });
+
+let mapInstance: any;
 
 function handleDataChange({ startDate, interval, mode }: { startDate: Date, interval: string, mode: string }) {
   const intervalMilliseconds = interval === 'день' ? 86400000 : interval === 'неделя' ? 604800000 : 2592000000;
@@ -74,7 +80,7 @@ function loadMoreClasses() {
 }
 
 onMounted(() => {
-  const mapInstance = L.map('map', { zoomControl: true, zoom: 3, center: [55.755819, 80.617644] });
+  mapInstance = L.map('map', { zoomControl: false, zoom: 3, center: [55.755819, 80.617644] });
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '...',
     maxZoom: 20,
@@ -86,6 +92,14 @@ onMounted(() => {
   showAll();
   layersStore.toggleLayer(0, displayedMasterClasses.value, myIcon);
 });
+
+function zoomIn() {
+  mapInstance.zoomIn();
+}
+
+function zoomOut() {
+  mapInstance.zoomOut();
+}
 
 const toggleModal = () => {
   isModalOpen.value = !isModalOpen.value;
@@ -108,6 +122,34 @@ const toggleModal = () => {
 
   &:hover {
     background-color: darken($green, 10%);
+  }
+}
+
+.zoom-controls {
+  position: absolute;
+  top: 50%;
+  right: 10px;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+
+  button {
+    width: 35px;
+    height: 35px;
+    background-color: $green;
+    color: $white;
+    border: none;
+    border-radius: 4px;
+    padding: 10px;
+    cursor: pointer;
+    font-size: 18px;
+    line-height: 18px;
+    transition: background-color 0.3s;
+
+    &:hover {
+      background-color: darken($green, 10%);
+    }
   }
 }
 </style>
