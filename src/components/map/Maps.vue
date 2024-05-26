@@ -1,7 +1,6 @@
 <template>
   <div class="main-container">
     <Nav />
-    <!-- <LayerToggleButton :displayed-master-classes="displayedMasterClasses" :my-icon="myIcon" /> -->
     <ListViewMasterClasses class="list-view" />
     <div id="map" class="maps-container"></div>
     <div class="controls-container">
@@ -9,8 +8,12 @@
       <button class="button button--small show-all-btn" @click="showAll">показать всё</button>
     </div>
     <div class="zoom-controls">
-      <button class="zoom-in" @click="zoomIn">+</button>
-      <button class="zoom-out" @click="zoomOut">-</button>
+      <button class="zoom-in" @click="zoomIn">
+        <img src="/src/assets/imgs/map-controls/tabler_search_plus.svg" alt="">
+      </button>
+      <button class="zoom-out" @click="zoomOut">
+        <img src="/src/assets/imgs/map-controls/tabler_search_minus.svg" alt="">
+      </button>
     </div>
   </div>
 </template>
@@ -19,6 +22,7 @@
 import icon from '@/assets/imgs/map-marker-svgrepo-com.svg';
 import { useMasterClassesStore } from "@/stores/masterClasses";
 import { computed, onMounted, ref } from "vue";
+import { toRaw } from "vue";
 import { useLayersStore } from "@/stores/layersStore";
 import ListViewMasterClasses from "@/components/map/ListViewMasterClasses.vue";
 import Timeline from "@/components/map/Timeline.vue";
@@ -49,6 +53,8 @@ const latestDate = computed(() => {
 });
 
 let mapInstance: any;
+let lastZoomTime = 0;
+const zoomCooldown = 500; // ms
 
 function handleDataChange({ startDate, interval, mode }: { startDate: Date, interval: string, mode: string }) {
   const intervalMilliseconds = interval === 'день' ? 86400000 : interval === 'неделя' ? 604800000 : 2592000000;
@@ -80,12 +86,14 @@ function loadMoreClasses() {
 }
 
 onMounted(() => {
-  mapInstance = L.map('map', { zoomControl: false, zoom: 3, center: [55.755819, 80.617644] });
+  const rawMapInstance = L.map('map', { zoomControl: false, zoom: 3, center: [55.755819, 80.617644] });
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '...',
     maxZoom: 20,
     minZoom: 3
-  }).addTo(mapInstance);
+  }).addTo(rawMapInstance);
+
+  mapInstance = toRaw(rawMapInstance);
 
   layersStore.initializeMap(mapInstance);
   layersStore.updateMarkers(displayedMasterClasses.value, myIcon);
@@ -94,11 +102,19 @@ onMounted(() => {
 });
 
 function zoomIn() {
-  mapInstance.zoomIn();
+  const now = Date.now();
+  if (mapInstance && now - lastZoomTime > zoomCooldown) {
+    mapInstance.zoomIn();
+    lastZoomTime = now;
+  }
 }
 
 function zoomOut() {
-  mapInstance.zoomOut();
+  const now = Date.now();
+  if (mapInstance && now - lastZoomTime > zoomCooldown) {
+    mapInstance.zoomOut();
+    lastZoomTime = now;
+  }
 }
 
 const toggleModal = () => {
@@ -132,15 +148,20 @@ const toggleModal = () => {
   transform: translateY(-50%);
   display: flex;
   flex-direction: column;
-  gap: 5px;
+  gap: 10px;
+
+  .zoom-in, .zoom-out {
+    display: flex;
+    align-items: center;
+  }
 
   button {
-    width: 35px;
-    height: 35px;
+    width: 48px;
+    height: 48px;
     background-color: $green;
     color: $white;
     border: none;
-    border-radius: 4px;
+    border-radius: 50%;
     padding: 10px;
     cursor: pointer;
     font-size: 18px;
