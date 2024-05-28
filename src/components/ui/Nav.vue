@@ -1,7 +1,3 @@
-<script setup lang="ts">
-// здесь можно импортировать необходимые зависимости, если такие есть
-</script>
-
 <template>
   <nav class="navbar">
     <div class="navbar__container">
@@ -24,11 +20,15 @@
         </select>
       </div>
       <div class="navbar__actions">
-        <button class="navbar__button">Войти</button>
+        <button class="navbar__button" @click="$emit('openAuthModal')">Войти</button>
       </div>
     </div>
   </nav>
 </template>
+
+<script setup lang="ts">
+// здесь можно импортировать необходимые зависимости, если такие есть
+</script>
 
 <style scoped lang="scss">
 @import "@/assets/variables";

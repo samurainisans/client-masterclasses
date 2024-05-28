@@ -1,6 +1,6 @@
 <template>
   <div class="main-container">
-    <Nav />
+    <Nav @openAuthModal="toggleModal" />
     <ListViewMasterClasses class="list-view" />
     <div id="map" class="maps-container"></div>
     <div class="controls-container">
@@ -14,7 +14,11 @@
       <button class="zoom-out" @click="zoomOut">
         <img src="/src/assets/imgs/map-controls/tabler_search_minus.svg" alt="">
       </button>
+      <button class="to-home" @click="zoomToHome">
+        <img src="/src/assets/imgs/map-controls/to_home.svg" alt="">
+      </button>
     </div>
+    <AuthModal :visible="isModalOpen" @close="toggleModal" />
   </div>
 </template>
 
@@ -27,6 +31,7 @@ import { useLayersStore } from "@/stores/layersStore";
 import ListViewMasterClasses from "@/components/map/ListViewMasterClasses.vue";
 import Timeline from "@/components/map/Timeline.vue";
 import Nav from "@/components/ui/Nav.vue";
+import AuthModal from "@/components/ui/auth/AuthModal.vue";
 
 const store = useMasterClassesStore();
 const layersStore = useLayersStore();
@@ -34,6 +39,7 @@ const displayedMasterClasses = ref<any[]>([]);
 const isModalOpen = ref(false);
 const perPage = 10;
 let currentPage = 1;
+let userMarker: any = null;
 
 const myIcon = L.icon({
   iconUrl: icon,
@@ -85,8 +91,8 @@ function loadMoreClasses() {
   currentPage++;
 }
 
-onMounted(() => {
-  const rawMapInstance = L.map('map', { zoomControl: false, zoom: 3, center: [55.755819, 80.617644] });
+function initializeMap(center: [number, number]) {
+  const rawMapInstance = L.map('map', { zoomControl: false, zoom: 13, center });
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '...',
     maxZoom: 20,
@@ -99,6 +105,21 @@ onMounted(() => {
   layersStore.updateMarkers(displayedMasterClasses.value, myIcon);
   showAll();
   layersStore.toggleLayer(0, displayedMasterClasses.value, myIcon);
+}
+
+onMounted(() => {
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(position => {
+      const { latitude, longitude } = position.coords;
+      initializeMap([latitude, longitude]);
+    }, () => {
+      alert("Не удалось получить ваше местоположение.");
+      initializeMap([55.755819, 37.617644]); // Default to Moscow if geolocation fails
+    });
+  } else {
+    alert("Ваш браузер не поддерживает геолокацию.");
+    initializeMap([55.755819, 37.617644]); // Default to Moscow if geolocation is not supported
+  }
 });
 
 function zoomIn() {
@@ -114,6 +135,25 @@ function zoomOut() {
   if (mapInstance && now - lastZoomTime > zoomCooldown) {
     mapInstance.zoomOut();
     lastZoomTime = now;
+  }
+}
+
+function zoomToHome() {
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(position => {
+      const { latitude, longitude } = position.coords;
+      if (mapInstance) {
+        if (userMarker) {
+          mapInstance.removeLayer(userMarker);
+        }
+        userMarker = L.marker([latitude, longitude]).addTo(mapInstance).bindPopup("Вы здесь").openPopup();
+        mapInstance.setView([latitude, longitude], 13);
+      }
+    }, () => {
+      alert("Не удалось получить ваше местоположение.");
+    });
+  } else {
+    alert("Ваш браузер не поддерживает геолокацию.");
   }
 }
 
@@ -150,9 +190,9 @@ const toggleModal = () => {
   flex-direction: column;
   gap: 10px;
 
-  .zoom-in, .zoom-out {
-    display: flex;
-    align-items: center;
+  .zoom-in, .zoom-out, .to-home {
+    //display: flex;
+    //align-items: center;
   }
 
   button {
