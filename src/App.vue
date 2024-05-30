@@ -1,14 +1,29 @@
-<script setup lang="ts">
-import Maps  from '@/components/map/Maps.vue'
-import AuthModal from "@/components/ui/auth/AuthModal.vue";
-
-</script>
-
+// src/App.vue
 <template>
-  <Maps />
-  <AuthModal />
+  <div id="app">
+    <Nav />
+    <main class="main-content">
+      <router-view />
+    </main>
+    <AuthModal v-if="showAuthModal" :visible="showAuthModal" @close="closeAuthModal" />
+  </div>
 </template>
 
-<style scoped>
+<script setup lang="ts">
+import { provide } from 'vue';
+import Nav from '@/components/ui/Nav.vue';
+import AuthModal from '@/components/ui/auth/AuthModal.vue';
+import { useAuthModal } from '@/stores/uses/useAuthModal';
 
+const { showAuthModal, openAuthModal, closeAuthModal } = useAuthModal();
+
+provide('openAuthModal', openAuthModal);
+provide('closeAuthModal', closeAuthModal);
+provide('showAuthModal', showAuthModal);
+</script>
+
+<style scoped>
+.main-content {
+  margin-top: 60px; /* отступ сверху равный высоте nav */
+}
 </style>

@@ -1,7 +1,8 @@
+// src/components/ui/Nav.vue
 <template>
   <nav class="navbar">
     <div class="navbar__container">
-      <div class="navbar__logo">ЛОГО</div>
+      <div class="navbar__logo" @click="goToHome">ЛОГО</div>
       <div class="navbar__search">
         <input type="text" placeholder="Найти мероприятие" />
       </div>
@@ -18,28 +19,50 @@
           <option>на любую тему</option>
           <!-- дополнительные опции -->
         </select>
+        <a class="navbar__link" @click="goToMap">На карту</a>
       </div>
       <div class="navbar__actions">
-        <button class="navbar__button" @click="$emit('openAuthModal')">Войти</button>
+        <button class="navbar__button" @click="openAuthModal">Войти</button>
       </div>
     </div>
   </nav>
 </template>
 
 <script setup lang="ts">
-// здесь можно импортировать необходимые зависимости, если такие есть
+import { useRouter } from 'vue-router';
+import { inject } from 'vue';
+
+const router = useRouter();
+const openAuthModal = inject('openAuthModal') as () => void;
+
+const goToHome = () => {
+  router.push({ name: 'Home' });
+};
+const goToMap = () => {
+  router.push({ name: 'Map' });
+};
 </script>
 
 <style scoped lang="scss">
 @import "@/assets/variables";
 
+.navbar__link {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
 .navbar {
   width: 100%;
   background-color: $white;
-  position: absolute;
+  position: fixed;
   top: 0;
   left: 0;
   z-index: 1000;
+  height: 60px;
 
   &__container {
     width: 100%;
@@ -55,6 +78,7 @@
     font-size: 24px;
     font-weight: bold;
     color: $green;
+    cursor: pointer;
   }
 
   &__search {

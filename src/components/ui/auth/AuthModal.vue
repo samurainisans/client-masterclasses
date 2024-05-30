@@ -1,3 +1,4 @@
+<!-- src/components/ui/auth/AuthModal.vue -->
 <template>
   <transition name="modal">
     <div class="modal" v-if="visible" @click.self="handleClose">
@@ -41,7 +42,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, reactive } from 'vue';
+import { ref, reactive, computed, watch } from 'vue';
 
 interface LoginForm {
   username: string;
@@ -83,6 +84,20 @@ const register = () => {
 const forgotPassword = () => {
   // логика восстановления пароля
   alert('Восстановление пароля');
+};
+
+const visible = computed(() => props.visible);
+watch(visible, (newVal) => {
+  if (!newVal) {
+    resetForm();
+  }
+});
+
+const resetForm = () => {
+  loginForm.username = '';
+  loginForm.password = '';
+  loginForm.usePhone = false;
+  loginForm.rememberMe = true;
 };
 </script>
 
