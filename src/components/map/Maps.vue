@@ -1,7 +1,9 @@
+<!-- components/Maps.vue -->
 <template>
   <div class="main-container">
+
     <Nav @openAuthModal="toggleModal" />
-    <ListViewMasterClasses class="list-view" />
+    <ListViewMasterClasses :masterClasses="displayedMasterClasses" class="list-view" />
     <div id="map" class="maps-container"></div>
     <div class="controls-container">
       <Timeline :start-date="earliestDate" :end-date="latestDate" @changeData="handleDataChange" class="timeline" />
@@ -25,7 +27,7 @@
 <script setup lang="ts">
 import icon from '@/assets/imgs/map-marker-svgrepo-com.svg';
 import { useMasterClassesStore } from "@/stores/masterClasses";
-import { computed, onMounted, ref } from "vue";
+import { computed, onMounted, ref, watch } from "vue";
 import { toRaw } from "vue";
 import { useLayersStore } from "@/stores/layersStore";
 import ListViewMasterClasses from "@/components/map/ListViewMasterClasses.vue";
@@ -51,11 +53,11 @@ const myIcon = L.icon({
 });
 
 const earliestDate = computed(() => {
-  return store.masterClasses.reduce((min, mc) => new Date(mc.start_time) < min ? new Date(mc.start_time) : min, new Date());
+  return store.masterClasses.reduce((min, mc) => new Date(mc.start_date) < min ? new Date(mc.start_date) : min, new Date());
 });
 
 const latestDate = computed(() => {
-  return store.masterClasses.reduce((max, mc) => new Date(mc.start_time) > max ? new Date(mc.start_time) : max, new Date());
+  return store.masterClasses.reduce((max, mc) => new Date(mc.start_date) > max ? new Date(mc.start_date) : max, new Date());
 });
 
 let mapInstance: any;
@@ -67,7 +69,7 @@ function handleDataChange({ startDate, interval, mode }: { startDate: Date, inte
   const endDate = new Date(startDate.getTime() + intervalMilliseconds);
 
   displayedMasterClasses.value = store.masterClasses.filter(mc => {
-    const mcDate = new Date(mc.start_time);
+    const mcDate = new Date(mc.start_date);
     return mode === 'накопительно' ? mcDate <= endDate : mcDate >= startDate && mcDate <= endDate;
   });
   currentPage = 1;
@@ -108,17 +110,26 @@ function initializeMap(center: [number, number]) {
 }
 
 onMounted(() => {
-  if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(position => {
-      const { latitude, longitude } = position.coords;
-      initializeMap([latitude, longitude]);
-    }, () => {
-      alert("Не удалось получить ваше местоположение.");
-      initializeMap([55.755819, 37.617644]); // Default to Moscow if geolocation fails
-    });
-  } else {
-    alert("Ваш браузер не поддерживает геолокацию.");
-    initializeMap([55.755819, 37.617644]); // Default to Moscow if geolocation is not supported
+  store.fetchMasterClasses().then(() => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(position => {
+        const { latitude, longitude } = position.coords;
+        initializeMap([latitude, longitude]);
+      }, () => {
+        alert("Не удалось получить ваше местоположение.");
+        initializeMap([55.755819, 37.617644]); // Default to Moscow if geolocation fails
+      });
+    } else {
+      alert("Ваш браузер не поддерживает геолокацию.");
+      initializeMap([55.755819, 37.617644]); // Default to Moscow if geolocation is not supported
+    }
+  });
+});
+
+// Следим за изменениями в данных и обновляем маркеры
+watch(() => store.masterClasses, (newData) => {
+  if (mapInstance) {
+    layersStore.updateMarkers(newData, myIcon);
   }
 });
 

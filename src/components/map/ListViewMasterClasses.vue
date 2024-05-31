@@ -1,11 +1,11 @@
-<!-- src/components/ListViewMasterClasses.vue-->
+<!-- src/components/ListViewMasterClasses.vue -->
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import { useMasterClassesStore } from '@/stores/masterClasses';
 import { useSidebarStore } from '@/stores/sidebarStore';
 import SidebarToggleButton from "@/components/map/SidebarToggleButton.vue";
 
-const { getMasterClasses } = useMasterClassesStore();
+const masterClassesStore = useMasterClassesStore();
 const sidebarStore = useSidebarStore();
 const listContainerRef = ref<HTMLDivElement | null>(null);
 
@@ -16,7 +16,7 @@ let currentPage = 1;
 const loadMoreClasses = () => {
   const start = (currentPage - 1) * perPage;
   const end = currentPage * perPage;
-  const newClasses = getMasterClasses.slice(start, end);
+  const newClasses = masterClassesStore.masterClasses.slice(start, end);
 
   masterClasses.value = [...masterClasses.value, ...newClasses];
   currentPage++;
@@ -33,8 +33,10 @@ const handleScroll = () => {
 };
 
 onMounted(() => {
-  loadMoreClasses();
-  listContainerRef.value?.addEventListener('scroll', handleScroll);
+  masterClassesStore.fetchMasterClasses().then(() => {
+    loadMoreClasses();
+    listContainerRef.value?.addEventListener('scroll', handleScroll);
+  });
 });
 </script>
 
@@ -43,9 +45,9 @@ onMounted(() => {
     <div :class="['sidebar-container', { 'closed': !sidebarStore.isOpen }]">
       <div :class="['list-container', { 'closed': !sidebarStore.isOpen }]" ref="listContainerRef">
         <ul class="mk-list">
-          <li v-for="mc in masterClasses" :key="mc.title" class="card-item">
+          <li v-for="mc in masterClasses" :key="mc.id" class="card-item">
             <div class="image-container">
-              <img :src="mc.image" alt="image" class="card-image">
+              <img :src="mc.image || '/default-image.jpg'" alt="image" class="card-image">
               <button class="favorite-btn"><img src="/src/assets/imgs/favorite.svg" alt="favorite"></button>
             </div>
             <div class="card-content">
@@ -55,7 +57,7 @@ onMounted(() => {
               <h3>{{ mc.title }}</h3>
               <div class="mc-footer">
                 <span class="location">{{ mc.location_name }}</span>
-                <span class="date">{{ new Date(mc.start_time).toLocaleDateString() }}</span>
+                <span class="date">{{ new Date(mc.start_date).toLocaleDateString() }}</span>
               </div>
               <button class="button button--large">
                 Подробнее
@@ -71,8 +73,6 @@ onMounted(() => {
   </div>
 </template>
 
-
-<!--// src/components/ListViewMasterClasses.vue-->
 <style lang="scss" scoped>
 @import "@/assets/variables";
 
@@ -154,12 +154,11 @@ onMounted(() => {
             padding: 10px;
             position: relative;
 
-
-            h3{
+            h3 {
               margin: 20px 0px;
             }
 
-            button{
+            button {
               margin-top: 30px;
             }
 

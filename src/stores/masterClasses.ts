@@ -1,23 +1,20 @@
+// stores/masterClasses.ts
 import { defineStore } from 'pinia';
-import data from '@/assets/enriched_masterclasses.json';
+import { fetchMasterClasses } from '@/services/masterClassService';
 
 type MasterClass = {
+    id: number;
     title: string;
     description: string;
     location_name: string;
-    categories: string[];
-    image: string | undefined;
-    speakers: {
-        name: string;
-        title: string;
-        image: string | undefined;
-    }[];
-    organizer: {
-        name: string | null;
-        logo: string | null;
-    };
+    categories: number[];
+    image: string | null;
+    speakers: number;
+    organizer: number;
     registration_deadline: string;
-    start_time: string;
+    start_date: string;
+    end_date: string;
+    duration: number;
     coordinates: {
         latitude: number;
         longitude: number;
@@ -26,29 +23,38 @@ type MasterClass = {
     province: string;
     area: string;
     locality: string;
-    street?: string;
-    house?: string;
-    postal_code?: string;
+    street: string;
+    house: string;
+    postal_code: string;
 };
-
-function parseData(data: any[]): MasterClass[] {
-    return data.map((item) => ({
-        ...item,
-        coordinates: {
-            latitude: parseFloat(item.coordinates.latitude),
-            longitude: parseFloat(item.coordinates.longitude),
-        },
-    }));
-}
 
 export const useMasterClassesStore = defineStore('masterClasses', {
     state: () => ({
-        masterClasses: parseData(data),
+        masterClasses: [] as MasterClass[],
+        loading: false,
+        error: null as string | null,
     }),
     getters: {
         getMasterClasses: (state) => state.masterClasses,
     },
     actions: {
+        async fetchMasterClasses() {
+            this.loading = true;
+            try {
+                const data = await fetchMasterClasses();
+                this.masterClasses = data.map((item) => ({
+                    ...item,
+                    coordinates: {
+                        latitude: parseFloat(item.latitude),
+                        longitude: parseFloat(item.longitude),
+                    },
+                }));
+                this.loading = false;
+            } catch (error) {
+                this.error = 'Failed to load master classes';
+                this.loading = false;
+            }
+        },
         updateMasterClass(index: number, newData: MasterClass) {
             this.masterClasses[index] = newData;
         },
