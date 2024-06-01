@@ -1,3 +1,4 @@
+<!--components/ui/filter/DatePicker.vue-->
 <template>
   <div class="datepicker-container">
     <VueDatePicker
@@ -8,37 +9,70 @@
       :range="{ partialRange: true }"
       now-button-label="Сейчас"
       placeholder="Выберите диапазон даты"
+      :min-date="new Date()"
+      :inline="{ input: true }"
+      auto-apply
+      text-input
+      model-auto
     />
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import VueDatePicker from '@vuepic/vue-datepicker';
+import VueDatePicker from '@vuepic/vue-datepicker'
 import '@vuepic/vue-datepicker/dist/main.css'
 
 const date = ref(null)
 </script>
 
 <style scoped lang="scss">
+@import '@/assets/variables';
+
 .datepicker-container {
-  width: 400px;
-  //--dp-menu-min-width: 600px;
-  //--dp-calendar-header-cell-padding: 1rem;
-  //--dp-cell-size: 35px;
+  width: 370px;
+  --dp-menu-min-width: 340px;
+  --dp-calendar-header-cell-padding: 1rem;
+  margin: 0 auto;
 }
 
-.dp__menu_inner {
-  width: var(--dp-menu-min-width) !important;
+.dp__outer_menu_wrap {
+  margin-top: 10px;
 }
 
-.dp__cell {
-  width: var(--dp-cell-size) !important;
-  height: var(--dp-cell-size) !important;
+.dp__flex_display_with_input {
+  align-items: normal;
 }
 
-.dp__header {
-  font-size: var(--dp-font-size) !important;
-  padding: var(--dp-calendar-header-cell-padding) !important;
+:root {
+  --dp-font-family: $font-family;
+  --dp-cell-border-radius: 4px;
+  --dp-common-transition: all 0.1s ease-in;
+
+  --dp-button-height: 35px;
+  --dp-month-year-row-height: 35px;
+  --dp-month-year-row-button-size: 35px;
+  --dp-button-icon-height: 20px;
+  --dp-cell-size: 35px;
+  --dp-cell-padding: 5px;
+  --dp-common-padding: 10px;
+  --dp-input-icon-padding: 35px;
+  --dp-input-padding: 6px 30px 6px 12px;
+  --dp-menu-min-width: 260px;
+  --dp-action-buttons-padding: 2px 5px;
+  --dp-row-margin: 5px 0;
+  --dp-calendar-header-cell-padding: 0.5rem;
+  --dp-two-calendars-spacing: 10px;
+  --dp-overlay-col-padding: 3px;
+  --dp-time-inc-dec-button-size: 32px;
+  --dp-menu-padding: 6px 8px;
+
+  --dp-font-size: 1rem;
+  --dp-preview-font-size: 0.8rem;
+  --dp-time-font-size: 0.8rem;
+
+  --dp-animation-duration: 0.1s;
+  --dp-menu-appear-transition-timing: cubic-bezier(0.4, 0, 1, 1);
+  --dp-transition-timing: ease-out;
 }
 </style>

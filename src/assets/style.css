@@ -19,6 +19,19 @@
     width: 300px;
 }
 
+.dp__outer_menu_wrap {
+    margin-top: 10px;
+}
+
+body{
+    font-family: "Inter", sans-serif;;
+}
+
+input{
+    font-family: inherit;
+}
+
+
 /*.loading-overlay {*/
 /*    position: absolute;*/
 /*    top: 0;*/

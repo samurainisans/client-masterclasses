@@ -1,32 +1,71 @@
+<!--components/ui/filter/FiltrationComponent.vue-->
 <template>
   <div class="filter_container">
-    <select class="navbar__select">
-      <option>все города</option>
-    </select>
-    <select class="navbar__select">
-      <option>в любое время</option>
-    </select>
-    <CategorySelect />
-    <DatePicker />
+    <div class="filter_section">
+      <h3>Выберите категорию</h3>
+      <CheckboxList :items="categoryItems" />
+    </div>
+    <div class="filter_section">
+      <h3>Выберите город</h3>
+      <CheckboxList :items="cityItems" />
+    </div>
+    <div class="filter_section datepicker-section">
+      <h3>Выберите дату</h3>
+      <DatePicker />
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import DatePicker from '@/components/ui/filter/DatePicker.vue';
-import CategorySelect from "@/components/ui/filter/CategorySelect.vue";
+import { ref, onMounted } from 'vue'
+import DatePicker from '@/components/ui/filter/DatePicker.vue'
+import CheckboxList from '@/components/ui/filter/CheckboxList.vue'
+import { fetchCategories, fetchCities } from '@/services/masterClassService'
+
+const categoryItems = ref<{ value: number; label: string }[]>([])
+const cityItems = ref<{ value: string; label: string }[]>([])
+
+const loadItems = async () => {
+  try {
+    const [categories, cities] = await Promise.all([fetchCategories(), fetchCities()])
+
+    categoryItems.value = categories.map((cat: { id: number; name: string }) => ({
+      value: cat.id,
+      label: cat.name
+    }))
+
+    cityItems.value = cities.map((city: { locality: string }) => ({
+      value: city.locality,
+      label: city.locality
+    }))
+  } catch (error) {
+    console.error('Не удалось загрузить данные', error)
+  }
+}
+
+onMounted(() => {
+  loadItems()
+})
 </script>
 
 <style scoped lang="scss">
 @import '@/assets/variables';
 
-
-
 .filter_container {
   display: flex;
-  gap: 20px;
+  gap: 50px;
+  padding: 20px;
+  justify-content: center;
+}
+
+.filter_section {
+  margin: 20px 0;
+  display: flex;
+  flex-direction: column;
   align-items: center;
-  padding: 10px 20px;
-  background-color: $white;
+}
+
+.datepicker-section {
 }
 
 .navbar__select {
@@ -37,6 +76,14 @@ import CategorySelect from "@/components/ui/filter/CategorySelect.vue";
   font-size: 14px;
   color: $green;
   cursor: pointer;
-  transition: background-color 0.3s, border-color 0.3s;
+  transition:
+    background-color 0.3s,
+    border-color 0.3s;
+}
+
+h3 {
+  margin-bottom: 10px;
+  color: $color-text;
+  text-align: center;
 }
 </style>

@@ -1,7 +1,7 @@
 <template>
   <div class="main-container">
     <Nav />
-    <FiltrationComponent/>
+    <FiltrationComponent />
     <div class="content">
       <div class="cards-container">
         <transition-group name="list" tag="div" class="cards-grid">
@@ -24,49 +24,49 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue';
-import { useMasterClassesStore } from '@/stores/masterClasses';
-import MasterClassCard from '@/components/ui/masterclass/MasterClassCard.vue';
-import Nav from '@/components/ui/navigation/Nav.vue';
-import FiltrationComponent from "@/components/ui/filter/FiltrationComponent.vue";
+import { ref, computed, onMounted } from 'vue'
+import { useMasterClassesStore } from '@/stores/masterClasses'
+import MasterClassCard from '@/components/ui/masterclass/MasterClassCard.vue'
+import Nav from '@/components/ui/navigation/Nav.vue'
+import FiltrationComponent from '@/components/ui/filter/FiltrationComponent.vue'
 
-const masterClassesStore = useMasterClassesStore();
-const currentPage = ref(1);
-const itemsPerPage = 30;
+const masterClassesStore = useMasterClassesStore()
+const currentPage = ref(1)
+const itemsPerPage = 30
 
 onMounted(() => {
-  masterClassesStore.fetchMasterClasses();
-});
+  masterClassesStore.fetchMasterClasses()
+})
 
 const paginatedMasterClasses = computed(() => {
-  const start = (currentPage.value - 1) * itemsPerPage;
-  const end = currentPage.value * itemsPerPage;
-  return masterClassesStore.getMasterClasses.slice(start, end);
-});
+  const start = (currentPage.value - 1) * itemsPerPage
+  const end = currentPage.value * itemsPerPage
+  return masterClassesStore.getMasterClasses.slice(start, end)
+})
 
 const totalPages = computed(() => {
-  return Math.ceil(masterClassesStore.getMasterClasses.length / itemsPerPage);
-});
+  return Math.ceil(masterClassesStore.getMasterClasses.length / itemsPerPage)
+})
 
 const prevPage = () => {
   if (currentPage.value > 1) {
-    currentPage.value--;
+    currentPage.value--
   }
-};
+}
 
 const nextPage = () => {
   if (currentPage.value < totalPages.value) {
-    currentPage.value++;
+    currentPage.value++
   }
-};
+}
 
 const goToLastPage = () => {
-  currentPage.value = totalPages.value;
-};
+  currentPage.value = totalPages.value
+}
 </script>
 
 <style scoped lang="scss">
-@import "@/assets/variables.scss";
+@import '@/assets/variables.scss';
 
 .main-container {
   width: 1520px;
@@ -115,11 +115,13 @@ button {
   }
 }
 
-.list-enter-active, .list-leave-active {
+.list-enter-active,
+.list-leave-active {
   transition: all 0.5s;
 }
 
-.list-enter-from, .list-leave-to {
+.list-enter-from,
+.list-leave-to {
   opacity: 0;
   transform: translateY(-5px);
 }
