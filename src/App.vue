@@ -1,4 +1,4 @@
-// src/App.vue
+<!-- src/App.vue-->
 <template>
   <div id="app">
     <Nav />
@@ -10,20 +10,20 @@
 </template>
 
 <script setup lang="ts">
-import { provide } from 'vue';
-import Nav from '@/components/ui/navigation/Nav.vue';
-import AuthModal from '@/components/ui/auth/AuthModal.vue';
-import { useAuthModal } from '@/stores/uses/useAuthModal';
+import { provide } from 'vue'
+import Nav from '@/components/ui/navigation/Nav.vue'
+import AuthModal from '@/components/ui/auth/AuthModal.vue'
+import { useAuthModal } from '@/stores/uses/useAuthModal'
 
-const { showAuthModal, openAuthModal, closeAuthModal } = useAuthModal();
+const { showAuthModal, openAuthModal, closeAuthModal } = useAuthModal()
 
-provide('openAuthModal', openAuthModal);
-provide('closeAuthModal', closeAuthModal);
-provide('showAuthModal', showAuthModal);
+provide('openAuthModal', openAuthModal)
+provide('closeAuthModal', closeAuthModal)
+provide('showAuthModal', showAuthModal)
 </script>
 
 <style scoped>
 .main-content {
-  margin-top: 60px; /* отступ сверху равный высоте navigation */
+  margin-top: 60px;
 }
 </style>

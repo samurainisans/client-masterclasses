@@ -1,12 +1,11 @@
 <template>
   <nav class="navbar">
     <div class="navbar__container">
-      <div class="navbar__logo" @click="goToHome">ЛОГО</div>
+      <div class="navbar__logo" @click="goToHome">Главная</div>
       <div class="navbar__search">
         <input type="text" placeholder="Найти мероприятие" />
       </div>
       <div class="navbar__filters">
-
         <a class="navbar__link" @click="goToMap">На карту</a>
       </div>
       <div class="navbar__actions">
@@ -17,43 +16,28 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
-import { useRouter } from 'vue-router';
-import { inject } from 'vue';
-import { fetchCategories } from '@/services/masterClassService';
+import { useRouter } from 'vue-router'
+import { inject } from 'vue'
 
-const router = useRouter();
-const openAuthModal = inject('openAuthModal') as () => void;
-
-const categories = ref([]);
-
-const loadCategories = async () => {
-  try {
-    categories.value = await fetchCategories();
-  } catch (error) {
-    console.error('Failed to load categories', error);
-  }
-};
-
-onMounted(() => {
-  loadCategories();
-});
+const router = useRouter()
+const openAuthModal = inject('openAuthModal') as () => void
 
 const goToHome = () => {
-  router.push({ name: 'Home' });
-};
+  router.push({ name: 'Home' })
+}
 const goToMap = () => {
-  router.push({ name: 'Map' });
-};
+  router.push({ name: 'Map' })
+}
 </script>
 
 <style scoped lang="scss">
-@import "@/assets/variables";
+@import '@/assets/variables';
 
 .navbar__link {
   cursor: pointer;
   display: flex;
   align-items: center;
+
   &:hover {
     text-decoration: underline;
   }
@@ -100,8 +84,6 @@ const goToMap = () => {
     }
   }
 
-
-
   &__actions {
     display: flex;
     align-items: center;
@@ -115,6 +97,7 @@ const goToMap = () => {
       cursor: pointer;
       font-size: 14px;
       margin-left: 200px;
+
       &:hover {
         background-color: darken($green, 10%);
       }
