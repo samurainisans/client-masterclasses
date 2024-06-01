@@ -1,7 +1,5 @@
-<!-- components/Maps.vue -->
 <template>
   <div class="main-container">
-
     <Nav @openAuthModal="toggleModal" />
     <ListViewMasterClasses :masterClasses="displayedMasterClasses" class="list-view" />
     <div id="map" class="maps-container"></div>

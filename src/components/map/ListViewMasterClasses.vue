@@ -1,6 +1,40 @@
-<!-- src/components/ListViewMasterClasses.vue -->
+<template>
+  <div class="sidebar-container__wrapper">
+    <div :class="['sidebar-container', { 'closed': !sidebarStore.isOpen }]">
+      <div :class="['list-container', { 'closed': !sidebarStore.isOpen }]" ref="listContainerRef">
+        <ul class="mk-list">
+          <li v-for="mc in masterClasses" :key="mc.id" class="card-item">
+            <div class="image-container">
+              <img :src="mc.image_url || '/default-image.jpg'" alt="image" class="card-image">
+              <button class="favorite-btn"><img src="/src/assets/imgs/favorite.svg" alt="favorite"></button>
+            </div>
+            <div class="card-content">
+              <div class="categories">
+                <span class="category-chip" v-for="category in mc.categories" :key="category.id">{{ category.name }}</span>
+              </div>
+              <h3>{{ mc.title }}</h3>
+              <p>Организатор: {{ mc.organizer.first_name }} {{ mc.organizer.last_name }}</p>
+              <p>Спикер: {{ mc.speaker.first_name }} {{ mc.speaker.last_name }}</p>
+              <div class="mc-footer">
+                <span class="location">{{ mc.location_name }}</span>
+                <span class="date">{{ new Date(mc.start_date).toLocaleDateString() }}</span>
+              </div>
+              <button class="button button--large">
+                Подробнее
+              </button>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+    <div class="sidebar-toggle-wrapper">
+      <SidebarToggleButton />
+    </div>
+  </div>
+</template>
+
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue';
+import { ref, onMounted } from 'vue';
 import { useMasterClassesStore } from '@/stores/masterClasses';
 import { useSidebarStore } from '@/stores/sidebarStore';
 import SidebarToggleButton from "@/components/map/SidebarToggleButton.vue";
@@ -39,39 +73,6 @@ onMounted(() => {
   });
 });
 </script>
-
-<template>
-  <div class="sidebar-container__wrapper">
-    <div :class="['sidebar-container', { 'closed': !sidebarStore.isOpen }]">
-      <div :class="['list-container', { 'closed': !sidebarStore.isOpen }]" ref="listContainerRef">
-        <ul class="mk-list">
-          <li v-for="mc in masterClasses" :key="mc.id" class="card-item">
-            <div class="image-container">
-              <img :src="mc.image || '/default-image.jpg'" alt="image" class="card-image">
-              <button class="favorite-btn"><img src="/src/assets/imgs/favorite.svg" alt="favorite"></button>
-            </div>
-            <div class="card-content">
-              <div class="categories">
-                <span class="category-chip" v-for="category in mc.categories" :key="category">{{ category }}</span>
-              </div>
-              <h3>{{ mc.title }}</h3>
-              <div class="mc-footer">
-                <span class="location">{{ mc.location_name }}</span>
-                <span class="date">{{ new Date(mc.start_date).toLocaleDateString() }}</span>
-              </div>
-              <button class="button button--large">
-                Подробнее
-              </button>
-            </div>
-          </li>
-        </ul>
-      </div>
-    </div>
-    <div class="sidebar-toggle-wrapper">
-      <SidebarToggleButton />
-    </div>
-  </div>
-</template>
 
 <style lang="scss" scoped>
 @import "@/assets/variables";
@@ -114,7 +115,6 @@ onMounted(() => {
         padding: 0;
         margin: 0;
         list-style: none;
-
 
         .card-item {
           min-width: 320px;

@@ -26,13 +26,13 @@ export const useLayersStore = defineStore('layersStore', () => {
         return;
       }
 
-      const marker = L.marker([item.coordinates.latitude, item.coordinates.longitude], {icon: myIcon})
+      const marker = L.marker([item.coordinates.latitude, item.coordinates.longitude], { icon: myIcon })
         .on('mouseover', () => {
           if (!marker.getPopup()) {
             marker.bindPopup(`
             <div class="marker-popup">
               <div class="image-container">
-                <img src="${item.image}" class="card-image" id="popup-image-${index}">
+                <img src="${item.image_url || '/default-image.jpg'}" class="card-image" id="popup-image-${index}">
               </div>
               <div class="card-content">
                 <strong>${item.title}</strong><br>
@@ -88,7 +88,7 @@ export const useLayersStore = defineStore('layersStore', () => {
       300
     ]);
 
-    heatmapLayer.value = L.heatLayer(heatData, {radius: 25});
+    heatmapLayer.value = L.heatLayer(heatData, { radius: 25 });
 
     if (map.value && heatmapLayer.value) {
       heatmapLayer.value.addTo(map.value);

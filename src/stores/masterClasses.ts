@@ -1,16 +1,30 @@
-// stores/masterClasses.ts
 import { defineStore } from 'pinia';
 import { fetchMasterClasses } from '@/services/masterClassService';
+
+type User = {
+    id: number;
+    username: string;
+    first_name: string;
+    last_name: string;
+    email: string;
+    bio: string | null;
+    image: string | null;
+};
+
+type Category = {
+    id: number;
+    name: string;
+};
 
 type MasterClass = {
     id: number;
     title: string;
     description: string;
     location_name: string;
-    categories: number[];
-    image: string | null;
-    speakers: number;
-    organizer: number;
+    categories: Category[];
+    image_url: string | null;
+    speaker: User;
+    organizer: User;
     registration_deadline: string;
     start_date: string;
     end_date: string;
