@@ -1,4 +1,3 @@
-// src/components/ui/Nav.vue
 <template>
   <nav class="navbar">
     <div class="navbar__container">
@@ -7,18 +6,7 @@
         <input type="text" placeholder="Найти мероприятие" />
       </div>
       <div class="navbar__filters">
-        <select class="navbar__select">
-          <option>все города</option>
-          <!-- дополнительные опции -->
-        </select>
-        <select class="navbar__select">
-          <option>в любое время</option>
-          <!-- дополнительные опции -->
-        </select>
-        <select class="navbar__select">
-          <option>на любую тему</option>
-          <!-- дополнительные опции -->
-        </select>
+
         <a class="navbar__link" @click="goToMap">На карту</a>
       </div>
       <div class="navbar__actions">
@@ -29,11 +17,27 @@
 </template>
 
 <script setup lang="ts">
+import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { inject } from 'vue';
+import { fetchCategories } from '@/services/masterClassService';
 
 const router = useRouter();
 const openAuthModal = inject('openAuthModal') as () => void;
+
+const categories = ref([]);
+
+const loadCategories = async () => {
+  try {
+    categories.value = await fetchCategories();
+  } catch (error) {
+    console.error('Failed to load categories', error);
+  }
+};
+
+onMounted(() => {
+  loadCategories();
+});
 
 const goToHome = () => {
   router.push({ name: 'Home' });
@@ -63,6 +67,7 @@ const goToMap = () => {
   left: 0;
   z-index: 1000;
   height: 60px;
+  border-bottom: 1px solid $gray;
 
   &__container {
     width: 100%;
@@ -95,20 +100,7 @@ const goToMap = () => {
     }
   }
 
-  &__filters {
-    display: flex;
-    gap: 20px;
 
-    .navbar__select {
-      padding: 8px 16px;
-      border: 1px solid $green;
-      border-radius: 5px;
-      background-color: $white;
-      font-size: 14px;
-      color: $green;
-      cursor: pointer;
-    }
-  }
 
   &__actions {
     display: flex;

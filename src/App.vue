@@ -11,7 +11,7 @@
 
 <script setup lang="ts">
 import { provide } from 'vue';
-import Nav from '@/components/ui/Nav.vue';
+import Nav from '@/components/ui/navigation/Nav.vue';
 import AuthModal from '@/components/ui/auth/AuthModal.vue';
 import { useAuthModal } from '@/stores/uses/useAuthModal';
 
@@ -24,6 +24,6 @@ provide('showAuthModal', showAuthModal);
 
 <style scoped>
 .main-content {
-  margin-top: 60px; /* отступ сверху равный высоте nav */
+  margin-top: 60px; /* отступ сверху равный высоте navigation */
 }
 </style>

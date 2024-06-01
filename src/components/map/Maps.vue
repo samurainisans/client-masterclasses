@@ -30,7 +30,7 @@ import { toRaw } from "vue";
 import { useLayersStore } from "@/stores/layersStore";
 import ListViewMasterClasses from "@/components/map/ListViewMasterClasses.vue";
 import Timeline from "@/components/map/Timeline.vue";
-import Nav from "@/components/ui/Nav.vue";
+import Nav from "@/components/ui/navigation/Nav.vue";
 import AuthModal from "@/components/ui/auth/AuthModal.vue";
 
 const store = useMasterClassesStore();
