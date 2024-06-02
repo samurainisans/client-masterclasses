@@ -1,12 +1,13 @@
-<!--components/ui/filter/DatePicker.vue-->
+<!-- components/ui/filter/DatePicker.vue -->
 <template>
   <div class="datepicker-container">
     <VueDatePicker
+      v-model="dateRange"
+      @update:model-value="onUpdateDateRange"
       cancel-text="Отмена"
       select-text="Выбрать диапазон"
       locale="ru"
-      v-model="date"
-      :range="{ partialRange: true }"
+      :range="true"
       now-button-label="Сейчас"
       placeholder="Выберите диапазон даты"
       :min-date="new Date()"
@@ -14,16 +15,37 @@
       auto-apply
       text-input
       model-auto
+      @clear="onClearDate"
     />
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
-import VueDatePicker from '@vuepic/vue-datepicker'
-import '@vuepic/vue-datepicker/dist/main.css'
+import { ref, watch } from 'vue';
+import VueDatePicker from '@vuepic/vue-datepicker';
+import '@vuepic/vue-datepicker/dist/main.css';
 
-const date = ref(null)
+const dateRange = ref<Date | Date[] | null>(null);
+
+const emit = defineEmits(['updateDateRange']);
+
+watch(dateRange, (newValue) => {
+  if (newValue === null) {
+    emit('updateDateRange', { startDate: null, endDate: null });
+  } else if (Array.isArray(newValue)) {
+    const [startDate, endDate] = newValue;
+    emit('updateDateRange', { startDate, endDate });
+  }
+});
+
+const onUpdateDateRange = (newValue: Date | Date[]) => {
+  dateRange.value = newValue;
+};
+
+const onClearDate = () => {
+  dateRange.value = null;
+  emit('updateDateRange', { startDate: null, endDate: null });
+};
 </script>
 
 <style scoped lang="scss">

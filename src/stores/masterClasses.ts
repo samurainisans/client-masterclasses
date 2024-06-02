@@ -48,6 +48,10 @@ export const useMasterClassesStore = defineStore('masterClasses', {
         masterClasses: [] as MasterClass[],
         loading: false,
         error: null as string | null,
+        selectedCategories: [] as number[],
+        selectedCities: [] as string[],
+        startDate: null as Date | null,
+        endDate: null as Date | null,
     }),
     getters: {
         getMasterClasses: (state) => state.masterClasses,
@@ -56,7 +60,7 @@ export const useMasterClassesStore = defineStore('masterClasses', {
         async fetchMasterClasses() {
             this.loading = true;
             try {
-                const data = await fetchMasterClasses();
+                const data = await fetchMasterClasses(this.selectedCategories, this.selectedCities, this.startDate, this.endDate);
                 this.masterClasses = data.map((item) => ({
                     ...item,
                     coordinates: {
@@ -72,6 +76,18 @@ export const useMasterClassesStore = defineStore('masterClasses', {
         },
         updateMasterClass(index: number, newData: MasterClass) {
             this.masterClasses[index] = newData;
+        },
+        setSelectedCategories(categories: number[]) {
+            this.selectedCategories = categories;
+        },
+        setSelectedCities(cities: string[]) {
+            this.selectedCities = cities;
+        },
+        setStartDate(date: Date | null) {
+            this.startDate = date;
+        },
+        setEndDate(date: Date | null) {
+            this.endDate = date;
         },
     },
 });

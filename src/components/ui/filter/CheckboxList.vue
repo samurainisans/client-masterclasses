@@ -14,30 +14,36 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue';
 
 const props = defineProps({
   items: {
     type: Array,
     required: true
   }
-})
+});
 
-const selectedItems = ref<(number | string)[]>([])
-const searchQuery = ref('')
+const selectedItems = ref<(number | string)[]>([]);
+const searchQuery = ref('');
+
+const emit = defineEmits(['update:selectedItems']);
+
+watch(selectedItems, (newValue) => {
+  emit('update:selectedItems', newValue);
+});
 
 const resetSelection = () => {
-  selectedItems.value = []
-}
+  selectedItems.value = [];
+};
 
 const filteredItems = computed(() => {
   if (!searchQuery.value) {
-    return props.items
+    return props.items;
   }
   return props.items.filter(item =>
     item.label.toLowerCase().includes(searchQuery.value.toLowerCase())
-  )
-})
+  );
+});
 </script>
 
 <style scoped lang="scss">
@@ -99,6 +105,8 @@ button {
   border-radius: 4px;
   cursor: pointer;
   text-align: center;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  font-family: $font-family;
 }
 
 button:hover {
