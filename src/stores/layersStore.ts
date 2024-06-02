@@ -22,11 +22,13 @@ export const useLayersStore = defineStore('layersStore', () => {
     markers.value.clearLayers();
 
     displayedMasterClasses.forEach((item, index) => {
-      if (!item.coordinates || isNaN(item.coordinates.latitude) || isNaN(item.coordinates.longitude)) {
+      const { latitude, longitude } = item.coordinates || {};
+
+      if (latitude === undefined || longitude === undefined || isNaN(latitude) || isNaN(longitude)) {
         return;
       }
 
-      const marker = L.marker([item.coordinates.latitude, item.coordinates.longitude], { icon: myIcon })
+      const marker = L.marker([latitude, longitude], { icon: myIcon })
         .on('mouseover', () => {
           if (!marker.getPopup()) {
             marker.bindPopup(`
@@ -82,11 +84,14 @@ export const useLayersStore = defineStore('layersStore', () => {
       map.value.removeLayer(heatmapLayer.value);
     }
 
-    const heatData = displayedMasterClasses.map(item => [
-      item.coordinates.latitude,
-      item.coordinates.longitude,
-      300
-    ]);
+    const heatData = displayedMasterClasses.map(item => {
+      const { latitude, longitude } = item.coordinates || {};
+
+      if (latitude === undefined || longitude === undefined || isNaN(latitude) || isNaN(longitude)) {
+        return null;
+      }
+      return [latitude, longitude, 300];
+    }).filter(item => item !== null);
 
     heatmapLayer.value = L.heatLayer(heatData, { radius: 25 });
 
@@ -99,7 +104,12 @@ export const useLayersStore = defineStore('layersStore', () => {
     const counts = {};
 
     displayedMasterClasses.forEach(item => {
-      const point = L.latLng(item.coordinates.latitude, item.coordinates.longitude);
+      const { latitude, longitude } = item.coordinates || {};
+
+      if (latitude === undefined || longitude === undefined || isNaN(latitude) || isNaN(longitude)) {
+        return;
+      }
+      const point = L.latLng(latitude, longitude);
       SubData.features.forEach(feature => {
         const polygon = L.geoJSON(feature).getLayers()[0];
         if (polygon.getBounds().contains(point)) {
@@ -127,7 +137,7 @@ export const useLayersStore = defineStore('layersStore', () => {
             eventCount > 10 ? '#FC4E2A' :
               eventCount > 5 ? '#FD8D3C' :
                 eventCount > 2 ? '#FEB24C' :
-                  eventCount > 10 ? '#FED976' :
+                  eventCount > 1 ? '#FED976' :
                     '#81817f';
     }
 

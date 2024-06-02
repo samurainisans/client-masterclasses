@@ -1,8 +1,10 @@
+<!-- src\components\map\Maps.vue -->
 <template>
   <div class="main-container">
     <Nav @openAuthModal="toggleModal" />
     <ListViewMasterClasses :masterClasses="displayedMasterClasses" class="list-view" />
     <div id="map" class="maps-container"></div>
+    <LayerToggleButton :displayedMasterClasses="displayedMasterClasses" :myIcon="myIcon" />
     <div class="controls-container">
       <Timeline :start-date="earliestDate" :end-date="latestDate" @changeData="handleDataChange" class="timeline" />
       <button class="button button--small show-all-btn" @click="showAll">показать всё</button>
@@ -32,6 +34,7 @@ import ListViewMasterClasses from "@/components/map/ListViewMasterClasses.vue";
 import Timeline from "@/components/map/Timeline.vue";
 import Nav from "@/components/ui/navigation/Nav.vue";
 import AuthModal from "@/components/ui/auth/AuthModal.vue";
+import LayerToggleButton from "@/components/map/LayerToggleButton.vue";
 
 const store = useMasterClassesStore();
 const layersStore = useLayersStore();

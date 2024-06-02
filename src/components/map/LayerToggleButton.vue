@@ -1,3 +1,4 @@
+<!-- src\components\map\LayerToggleButton.vue -->
 <script setup lang="ts">
 import { useLayersStore } from '@/stores/layersStore';
 
@@ -31,10 +32,10 @@ const selectLayer = (index: number) => {
     <span>Картографическая основа</span>
     <div class="wrapper-layers">
       <div
-          v-for="(layer, index) in layers"
-          :key="index"
-          class="layer"
-          @click="selectLayer(index)"
+        v-for="(layer, index) in layers"
+        :key="index"
+        class="layer"
+        @click="selectLayer(index)"
       >
         <img :src="layersStore.activeLayer === index ? layer.activeSrc : layer.inactiveSrc"
              :class="{ 'active-layer': layersStore.activeLayer === index }"
