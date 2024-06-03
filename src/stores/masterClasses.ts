@@ -1,6 +1,6 @@
 // src/stores/masterClasses.ts
 import { defineStore } from 'pinia';
-import { fetchMasterClasses, searchMasterClassesByTitle } from '@/services/masterClassService';
+import { fetchMasterClasses, searchMasterClassesByTitle,createMasterClassAPI } from '@/services/masterClassService';
 
 type User = {
     id: number;
@@ -71,6 +71,17 @@ export const useMasterClassesStore = defineStore('masterClasses', {
                 this.loading = false;
             } catch (error) {
                 this.error = 'Failed to load master classes';
+                this.loading = false;
+            }
+        },
+        async createMasterClass(masterClass: any) {
+            this.loading = true;
+            try {
+                await createMasterClassAPI(masterClass);
+                await this.fetchMasterClasses();
+                this.loading = false;
+            } catch (error) {
+                this.error = 'Failed to create master class';
                 this.loading = false;
             }
         },

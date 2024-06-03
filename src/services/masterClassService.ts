@@ -58,3 +58,21 @@ export const searchMasterClassesByTitle = async (title: string) => {
     throw error;
   }
 };
+
+export const createMasterClassAPI = async (masterClass) => {
+  try {
+    const formData = new FormData();
+    Object.keys(masterClass).forEach(key => {
+      formData.append(key, masterClass[key]);
+    });
+    const response = await axios.post(`${BASE_URL}/masterclasses/`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error creating master class:', error);
+    throw error;
+  }
+};

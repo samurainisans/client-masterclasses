@@ -13,8 +13,12 @@
       <div class="navbar__filters">
         <a class="navbar__link" @click="goToMap">На карту</a>
       </div>
+
       <div class="navbar__actions">
         <button class="navbar__button" @click="openAuthModal">Войти</button>
+      </div>
+      <div class="navbar__actions">
+        <button class="navbar__button" @click="goToAddMasterClass">Добавить мастер-класс</button>
       </div>
     </div>
   </nav>
@@ -36,6 +40,10 @@ const goToHome = () => {
 }
 const goToMap = () => {
   router.push({ name: 'Map' })
+}
+
+const goToAddMasterClass = () => {
+  router.push({ name: 'AddMasterClass' })
 }
 
 const searchMasterClasses = async () => {
