@@ -74,7 +74,7 @@ const goToLastPage = () => {
 }
 
 .content {
-  padding: 20px;
+  padding: 10px 20px 20px;
 }
 
 .cards-container {

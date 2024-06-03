@@ -9,13 +9,14 @@
     --font-family: "Inter", sans-serif;
     --second-family: "Lato", sans-serif;
     font-family: var(--font-family);
+
 }
 
 * {
     margin: 0;
 }
 
-.image-container img{
+.image-container img {
     width: 300px;
 }
 
@@ -23,11 +24,15 @@
     margin-top: 10px;
 }
 
-body{
+.dp_menu {
+    font-size: 13px;
+}
+
+body {
     font-family: "Inter", sans-serif;;
 }
 
-input{
+input {
     font-family: inherit;
 }
 
@@ -79,6 +84,8 @@ input{
 .fade-enter-active, .fade-leave-active {
     transition: opacity 0.5s;
 }
-.fade-enter, .fade-leave-to /* .fade-leave-active in <2.1.8 */ {
+
+.fade-enter, .fade-leave-to /* .fade-leave-active in <2.1.8 */
+{
     opacity: 0;
 }

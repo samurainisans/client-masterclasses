@@ -1,16 +1,20 @@
-<!-- components/ui/filter/FiltrationComponent.vue -->
 <template>
   <div class="filter_container">
     <div class="filter_section">
-      <h3>Выберите категорию</h3>
-      <CheckboxList :items="categoryItems" @update:selectedItems="updateCategories" />
+      <CheckboxList
+        :items="categoryItems"
+        buttonText="на любую тему"
+        @update:selectedItems="updateCategories"
+      />
     </div>
     <div class="filter_section">
-      <h3>Выберите город</h3>
-      <CheckboxList :items="cityItems" @update:selectedItems="updateCities" />
+      <CheckboxList
+        :items="cityItems"
+        buttonText="в любом городе"
+        @update:selectedItems="updateCities"
+      />
     </div>
     <div class="filter_section datepicker-section">
-      <h3>Выберите дату</h3>
       <DatePicker @updateDateRange="updateDateRange" />
     </div>
   </div>
@@ -42,7 +46,7 @@ const loadItems = async () => {
       label: city.locality,
     }));
   } catch (error) {
-    console.error('Не удалось загрузить данные', error);
+    console.error('не удалось загрузить данные', error);
   }
 };
 
@@ -73,7 +77,7 @@ onMounted(() => {
 .filter_container {
   display: flex;
   gap: 50px;
-  padding: 20px;
+  padding: 20px 20px 0px;
   justify-content: center;
 }
 
