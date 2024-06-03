@@ -1,6 +1,6 @@
 // src/stores/masterClasses.ts
 import { defineStore } from 'pinia';
-import { fetchMasterClasses } from '@/services/masterClassService';
+import { fetchMasterClasses, searchMasterClassesByTitle } from '@/services/masterClassService';
 
 type User = {
     id: number;
@@ -73,6 +73,26 @@ export const useMasterClassesStore = defineStore('masterClasses', {
                 this.error = 'Failed to load master classes';
                 this.loading = false;
             }
+        },
+        async searchMasterClassesByTitle(title: string) {
+            this.loading = true;
+            try {
+                const data = await searchMasterClassesByTitle(title);
+                this.masterClasses = data.map((item) => ({
+                    ...item,
+                    coordinates: {
+                        latitude: parseFloat(item.latitude),
+                        longitude: parseFloat(item.longitude),
+                    },
+                }));
+                this.loading = false;
+            } catch (error) {
+                this.error = 'Failed to search master classes';
+                this.loading = false;
+            }
+        },
+        setMasterClasses(masterClasses: MasterClass[]) {
+            this.masterClasses = masterClasses;
         },
         updateMasterClass(index: number, newData: MasterClass) {
             this.masterClasses[index] = newData;

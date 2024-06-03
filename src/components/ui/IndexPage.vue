@@ -12,19 +12,22 @@
             class="list-item"
           />
         </transition-group>
+        <div v-if="!loading && masterClassesStore.getMasterClasses.length === 0" class="no-results">
+          Не найдено мастер-классов с таким названием :(
+        </div>
       </div>
-      <div class="pagination">
-        <button :disabled="currentPage === 1" @click="prevPage">Предыдущая</button>
-        <span>Страница {{ currentPage }} из {{ totalPages }}</span>
-        <button :disabled="currentPage === totalPages" @click="nextPage">Следующая</button>
-        <button @click="goToLastPage">Последняя</button>
+      <div class="pagination" v-if="totalPages > 1">
+        <button :disabled="currentPage === 1" @click="prevPage">предыдущая</button>
+        <span>страница {{ currentPage }} из {{ totalPages }}</span>
+        <button :disabled="currentPage === totalPages" @click="nextPage">следующая</button>
+        <button @click="goToLastPage">последняя</button>
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { useMasterClassesStore } from '@/stores/masterClasses'
 import MasterClassCard from '@/components/ui/masterclass/MasterClassCard.vue'
 import Nav from '@/components/ui/navigation/Nav.vue'
@@ -33,6 +36,7 @@ import FiltrationComponent from '@/components/ui/filter/FiltrationComponent.vue'
 const masterClassesStore = useMasterClassesStore()
 const currentPage = ref(1)
 const itemsPerPage = 30
+const loading = computed(() => masterClassesStore.loading)
 
 onMounted(() => {
   masterClassesStore.fetchMasterClasses()
@@ -63,6 +67,10 @@ const nextPage = () => {
 const goToLastPage = () => {
   currentPage.value = totalPages.value
 }
+
+watch(() => masterClassesStore.getMasterClasses, () => {
+  currentPage.value = 1
+})
 </script>
 
 <style scoped lang="scss">
@@ -80,12 +88,20 @@ const goToLastPage = () => {
 .cards-container {
   display: flex;
   justify-content: center;
+  flex-direction: column;
+  align-items: center;
 }
 
 .cards-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 20px;
+}
+
+.no-results {
+  margin-top: 20px;
+  font-size: 18px;
+  color: $gray;
 }
 
 .pagination {

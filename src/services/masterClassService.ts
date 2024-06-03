@@ -45,3 +45,16 @@ export const fetchCities = async () => {
     throw error;
   }
 };
+
+// search masterclasses by title {{BASE_URL}}/masterclasses/?search=title
+export const searchMasterClassesByTitle = async (title: string) => {
+  try {
+    const params = new URLSearchParams();
+    params.append('search', title);
+    const response = await axios.get(`${BASE_URL}/masterclasses/`, { params });
+    return response.data;
+  } catch (error) {
+    console.error('Error searching master classes:', error);
+    throw error;
+  }
+};
