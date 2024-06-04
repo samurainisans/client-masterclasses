@@ -1,12 +1,7 @@
-<!-- components/ui/filter/CheckboxList.vue -->
 <template>
-  <div class="filter-dropdown" @mouseleave="closeDropdown">
-    <button class="filter-button" @click="toggleDropdown">
-      {{ buttonText }}
-      <img :class="{ 'rotated': isDropdownOpen }" src="@/assets/imgs/dropdown.svg" alt="Dropdown Icon" />
-    </button>
-    <transition name="fade">
-      <div v-if="isDropdownOpen" class="checkbox-container" @click.stop>
+  <div class="filter-dropdown" @mouseleave="closeDropdown" :class="{ inline: inline }">
+    <template v-if="inline">
+      <div class="checkbox-container">
         <input type="text" v-model="searchQuery" placeholder="Поиск" />
         <div class="checkbox-list">
           <div v-for="item in filteredItems" :key="item.value">
@@ -18,7 +13,31 @@
         </div>
         <button @click="resetSelection">Сбросить</button>
       </div>
-    </transition>
+    </template>
+    <template v-else>
+      <button class="filter-button" @click="toggleDropdown">
+        {{ buttonText }}
+        <img
+          :class="{ rotated: isDropdownOpen }"
+          src="@/assets/imgs/dropdown.svg"
+          alt="Dropdown Icon"
+        />
+      </button>
+      <transition name="fade">
+        <div v-if="isDropdownOpen" class="checkbox-container" @click.stop>
+          <input type="text" v-model="searchQuery" placeholder="Поиск" />
+          <div class="checkbox-list">
+            <div v-for="item in filteredItems" :key="item.value">
+              <label>
+                <input type="checkbox" v-model="selectedItems" :value="item.value" />
+                {{ item.label }}
+              </label>
+            </div>
+          </div>
+          <button @click="resetSelection">Сбросить</button>
+        </div>
+      </transition>
+    </template>
   </div>
 </template>
 
@@ -33,6 +52,10 @@ const props = defineProps({
   buttonText: {
     type: String,
     default: 'Выбрать'
+  },
+  inline: {
+    type: Boolean,
+    default: false
   }
 })
 
@@ -94,6 +117,11 @@ onBeforeUnmount(() => {
   width: 200px;
 }
 
+.filter-dropdown.inline {
+  border: none;
+  width: auto;
+}
+
 .filter-button {
   padding: 10px 20px;
   background-color: $white;
@@ -139,6 +167,12 @@ onBeforeUnmount(() => {
   transition: opacity 0.3s ease;
 }
 
+.filter-dropdown.inline .checkbox-container {
+  position: static;
+  transform: none;
+  width: 100%;
+}
+
 input[type='text'] {
   width: 94.5%;
   padding: 8px;
@@ -178,7 +212,7 @@ input[type='text'] {
   }
 
   &::-webkit-scrollbar-thumb:hover {
-    background: $green ;
+    background: $green;
   }
 }
 
@@ -215,11 +249,13 @@ button:hover {
   background-color: $color-primary-hover;
 }
 
-.fade-enter-active, .fade-leave-active {
+.fade-enter-active,
+.fade-leave-active {
   transition: opacity 0.3s ease;
 }
 
-.fade-enter, .fade-leave-to {
+.fade-enter,
+.fade-leave-to {
   opacity: 0;
 }
 </style>

@@ -1,6 +1,6 @@
 // src/stores/masterClasses.ts
 import { defineStore } from 'pinia';
-import { fetchMasterClasses, searchMasterClassesByTitle,createMasterClassAPI } from '@/services/masterClassService';
+import { fetchMasterClasses, searchMasterClassesByTitle, createMasterClassAPI, fetchCategories, fetchOrganizers, fetchSpeakers, geocodeAddress } from '@/services/masterClassService';
 
 type User = {
     id: number;
@@ -24,7 +24,7 @@ type MasterClass = {
     location_name: string;
     categories: Category[];
     image_url: string | null;
-    speakers: User;
+    speakers: User[];
     organizer: User;
     registration_deadline: string;
     start_date: string;
@@ -46,15 +46,30 @@ type MasterClass = {
 export const useMasterClassesStore = defineStore('masterClasses', {
     state: () => ({
         masterClasses: [] as MasterClass[],
+        organizers: [] as User[],
+        speakers: [] as User[],
         loading: false,
         error: null as string | null,
         selectedCategories: [] as number[],
         selectedCities: [] as string[],
         startDate: null as Date | null,
         endDate: null as Date | null,
+        addressData: {
+            latitude: 0,
+            longitude: 0,
+            country: '',
+            province: '',
+            area: '',
+            locality: '',
+            street: '',
+            house: '',
+            postal_code: ''
+        }
     }),
     getters: {
         getMasterClasses: (state) => state.masterClasses,
+        getOrganizers: (state) => state.organizers,
+        getSpeakers: (state) => state.speakers,
     },
     actions: {
         async fetchMasterClasses() {
@@ -72,6 +87,20 @@ export const useMasterClassesStore = defineStore('masterClasses', {
             } catch (error) {
                 this.error = 'Failed to load master classes';
                 this.loading = false;
+            }
+        },
+        async fetchOrganizers() {
+            try {
+                this.organizers = await fetchOrganizers();
+            } catch (error) {
+                this.error = 'Failed to fetch organizers';
+            }
+        },
+        async fetchSpeakers() {
+            try {
+                this.speakers = await fetchSpeakers();
+            } catch (error) {
+                this.error = 'Failed to fetch speakers';
             }
         },
         async createMasterClass(masterClass: any) {
@@ -100,6 +129,31 @@ export const useMasterClassesStore = defineStore('masterClasses', {
             } catch (error) {
                 this.error = 'Failed to search master classes';
                 this.loading = false;
+            }
+        },
+        async fetchCategories() {
+            try {
+                return await fetchCategories();
+            } catch (error) {
+                this.error = 'Failed to fetch categories';
+            }
+        },
+        async geocodeAddress(locationName: string) {
+            try {
+                const data = await geocodeAddress(locationName);
+                this.addressData = {
+                    latitude: data.latitude,
+                    longitude: data.longitude,
+                    country: data.country,
+                    province: data.province,
+                    area: data.area,
+                    locality: data.locality,
+                    street: data.street,
+                    house: data.house,
+                    postal_code: data.postal_code,
+                };
+            } catch (error) {
+                this.error = 'Failed to geocode address';
             }
         },
         setMasterClasses(masterClasses: MasterClass[]) {
