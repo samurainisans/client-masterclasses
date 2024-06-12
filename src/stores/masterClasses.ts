@@ -1,6 +1,6 @@
-// src/stores/masterClasses.ts
+//  src\stores\masterClasses.ts
 import { defineStore } from 'pinia';
-import { fetchMasterClasses, searchMasterClassesByTitle, createMasterClassAPI, fetchCategories, fetchOrganizers, fetchSpeakers, geocodeAddress } from '@/services/masterClassService';
+import { fetchMasterClasses, searchMasterClassesByTitle, createMasterClassAPI, fetchCategories, fetchOrganizers, fetchSpeakers, geocodeAddress, reverseGeocodeCoordinates } from '@/services/masterClassService';
 
 type User = {
     id: number;
@@ -41,6 +41,8 @@ type MasterClass = {
     street: string;
     house: string;
     postal_code: string;
+    requires_approval: boolean;
+    price: string;
 };
 
 export const useMasterClassesStore = defineStore('masterClasses', {
@@ -86,6 +88,23 @@ export const useMasterClassesStore = defineStore('masterClasses', {
                 this.loading = false;
             } catch (error) {
                 this.error = 'Failed to load master classes';
+                this.loading = false;
+            }
+        },
+        async fetchAllMasterClasses() {
+            this.loading = true;
+            try {
+                const data = await fetchMasterClasses(this.selectedCategories, this.selectedCities, this.startDate, this.endDate, true);
+                this.masterClasses = data.map((item) => ({
+                    ...item,
+                    coordinates: {
+                        latitude: parseFloat(item.latitude),
+                        longitude: parseFloat(item.longitude),
+                    },
+                }));
+                this.loading = false;
+            } catch (error) {
+                this.error = 'Failed to load all master classes';
                 this.loading = false;
             }
         },
@@ -154,6 +173,24 @@ export const useMasterClassesStore = defineStore('masterClasses', {
                 };
             } catch (error) {
                 this.error = 'Failed to geocode address';
+            }
+        },
+        async reverseGeocodeCoordinates(longitude: number, latitude: number) {
+            try {
+                const data = await reverseGeocodeCoordinates(longitude, latitude);
+                this.addressData = {
+                    latitude: data.latitude,
+                    longitude: data.longitude,
+                    country: data.country,
+                    province: data.province,
+                    area: data.area,
+                    locality: data.locality,
+                    street: data.street,
+                    house: data.house,
+                    postal_code: data.postal_code,
+                };
+            } catch (error) {
+                this.error = 'Failed to reverse geocode coordinates';
             }
         },
         setMasterClasses(masterClasses: MasterClass[]) {

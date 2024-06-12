@@ -32,7 +32,7 @@
       <!-- Превью -->
       <div class="form-group">
         <label>Превью</label>
-        <input type="file" @change="handleFileUpload" />
+        <input type="file" @change="handleFileUpload" accept="image/*" />
       </div>
 
       <!-- описание мероприятия -->
@@ -80,6 +80,19 @@
         <input type="datetime-local" v-model="form.end_date" required />
       </div>
 
+      <!-- Цена -->
+      <div class="form-group">
+        <label>Цена</label>
+        <input type="number" v-model="form.price" required />
+      </div>
+
+      <!-- Требуется подтверждение -->
+      <div class="form-group">
+        <label>
+          <input type="checkbox" v-model="form.requires_approval" /> Требуется подтверждение
+        </label>
+      </div>
+
       <!-- Адрес мероприятия -->
       <div class="form-group address-group">
         <label>Укажите адрес мероприятия</label>
@@ -95,7 +108,7 @@
       <!-- Улица -->
       <div class="form-group">
         <label>Улица</label>
-        <input  readonly type="text" v-model="form.street" required />
+        <input readonly type="text" v-model="form.street" required />
       </div>
 
       <!-- Дом -->
@@ -128,23 +141,23 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, nextTick, computed } from 'vue'
-import { useMasterClassesStore } from '@/stores/masterClasses'
-import L from 'leaflet'
-import CheckboxList from '@/components/ui/filter/CheckboxList.vue'
+import { ref, onMounted, nextTick, computed } from 'vue';
+import { useMasterClassesStore } from '@/stores/masterClasses';
+import L from 'leaflet';
+import CheckboxList from '@/components/ui/filter/CheckboxList.vue';
 
-const masterClassesStore = useMasterClassesStore()
+const masterClassesStore = useMasterClassesStore();
 const form = ref({
   title: '',
   categories: [],
   description: '',
-  location_name: '', // Название улицы
+  location_name: '',
   start_date: '',
   end_date: '',
-  end_register_date: '', // Окончательная дата регистрации
-  image: null,
-  organizer: null, // ID организатора
-  speaker: null, // ID спикера
+  end_register_date: '',
+  image_url: null,
+  organizer: null,
+  speaker: null,
   longitude: '',
   latitude: '',
   country: '',
@@ -154,123 +167,141 @@ const form = ref({
   street: '',
   house: '',
   postal_code: '',
-  duration: 0 // Длительность мастер-класса
-})
+  duration: 0,
+  price: 0,
+  requires_approval: false
+});
 
-const categories = ref([])
-const organizers = ref([])
-const speakers = ref([])
+const categories = ref([]);
+const organizers = ref([]);
+const speakers = ref([]);
 
 const fetchCategories = async () => {
   try {
-    const data = await masterClassesStore.fetchCategories()
-    categories.value = data.map((category) => ({ value: category.id, label: category.name }))
+    const data = await masterClassesStore.fetchCategories();
+    categories.value = data.map((category) => ({ value: category.id, label: category.name }));
   } catch (error) {
-    console.error('Error fetching categories:', error)
+    console.error('Error fetching categories:', error);
   }
-}
+};
 
 const fetchOrganizers = async () => {
   try {
-    await masterClassesStore.fetchOrganizers()
-    organizers.value = masterClassesStore.getOrganizers
+    await masterClassesStore.fetchOrganizers();
+    organizers.value = masterClassesStore.getOrganizers;
   } catch (error) {
-    console.error('Error fetching organizers:', error)
+    console.error('Error fetching organizers:', error);
   }
-}
+};
 
 const fetchSpeakers = async () => {
   try {
-    await masterClassesStore.fetchSpeakers()
-    speakers.value = masterClassesStore.getSpeakers
+    await masterClassesStore.fetchSpeakers();
+    speakers.value = masterClassesStore.getSpeakers;
   } catch (error) {
-    console.error('Error fetching speakers:', error)
+    console.error('Error fetching speakers:', error);
   }
-}
+};
 
 const updateCategories = (selectedItems) => {
-  form.value.categories = selectedItems
-}
+  form.value.categories = selectedItems;
+};
 
 const selectedCategoryLabels = computed(() => {
-  return categories.value.filter((category) => form.value.categories.includes(category.value))
-})
+  return categories.value.filter((category) => form.value.categories.includes(category.value));
+});
 
 const removeCategory = (categoryId) => {
-  form.value.categories = form.value.categories.filter((id) => id !== categoryId)
-}
+  form.value.categories = form.value.categories.filter((id) => id !== categoryId);
+};
 
-let map
-let marker
+let map;
+let marker;
 
 onMounted(async () => {
-  await fetchCategories()
-  await fetchOrganizers()
-  await fetchSpeakers()
+  await fetchCategories();
+  await fetchOrganizers();
+  await fetchSpeakers();
 
   await nextTick(() => {
     map = L.map('mapContainer', {
       center: [55.7558, 37.6173], // центр карты (Москва)
       zoom: 10
-    })
+    });
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '© OpenStreetMap contributors'
-    }).addTo(map)
+    }).addTo(map);
 
-    map.on('click', (e) => {
-      const { lat, lng } = e.latlng
-      form.value.latitude = lat
-      form.value.longitude = lng
+    map.on('click', async (e) => {
+      const { lat, lng } = e.latlng;
+      form.value.latitude = lat;
+      form.value.longitude = lng;
 
       if (marker) {
-        marker.setLatLng([lat, lng])
+        marker.setLatLng([lat, lng]);
       } else {
-        marker = L.marker([lat, lng]).addTo(map).bindPopup('Вы выбрали это место').openPopup()
+        marker = L.marker([lat, lng]).addTo(map).bindPopup('Вы выбрали это место').openPopup();
       }
-    })
-  })
-})
+
+      try {
+        await masterClassesStore.reverseGeocodeCoordinates(lng, lat);
+        form.value.latitude = masterClassesStore.addressData.latitude;
+        form.value.longitude = masterClassesStore.addressData.longitude;
+        form.value.country = masterClassesStore.addressData.country;
+        form.value.province = masterClassesStore.addressData.province;
+        form.value.area = masterClassesStore.addressData.area;
+        form.value.locality = masterClassesStore.addressData.locality;
+        form.value.street = masterClassesStore.addressData.street;
+        form.value.house = masterClassesStore.addressData.house;
+        form.value.postal_code = masterClassesStore.addressData.postal_code;
+      } catch (error) {
+        console.error('Error reverse geocoding coordinates:', error);
+      }
+    });
+  });
+});
 
 const handleFileUpload = (event: Event) => {
-  const file = (event.target as HTMLInputElement).files[0]
-  form.value.image = file
-}
+  const file = (event.target as HTMLInputElement).files[0];
+  if (file) {
+    form.value.image_url = file;
+  }
+};
 
 const checkAddress = async () => {
   try {
-    await masterClassesStore.geocodeAddress(form.value.location_name)
-    form.value.latitude = masterClassesStore.addressData.latitude
-    form.value.longitude = masterClassesStore.addressData.longitude
-    form.value.country = masterClassesStore.addressData.country
-    form.value.province = masterClassesStore.addressData.province
-    form.value.area = masterClassesStore.addressData.area
-    form.value.locality = masterClassesStore.addressData.locality
-    form.value.street = masterClassesStore.addressData.street
-    form.value.house = masterClassesStore.addressData.house
-    form.value.postal_code = masterClassesStore.addressData.postal_code
+    await masterClassesStore.geocodeAddress(form.value.location_name);
+    form.value.latitude = masterClassesStore.addressData.latitude;
+    form.value.longitude = masterClassesStore.addressData.longitude;
+    form.value.country = masterClassesStore.addressData.country;
+    form.value.province = masterClassesStore.addressData.province;
+    form.value.area = masterClassesStore.addressData.area;
+    form.value.locality = masterClassesStore.addressData.locality;
+    form.value.street = masterClassesStore.addressData.street;
+    form.value.house = masterClassesStore.addressData.house;
+    form.value.postal_code = masterClassesStore.addressData.postal_code;
 
-    // установить метку на карте
-    const { latitude, longitude } = masterClassesStore.addressData
-    map.setView([latitude, longitude], 13)
+    const { latitude, longitude } = masterClassesStore.addressData;
+    map.setView([latitude, longitude], 13);
     if (marker) {
-      marker.setLatLng([latitude, longitude])
+      marker.setLatLng([latitude, longitude]);
     } else {
-      marker = L.marker([latitude, longitude]).addTo(map).bindPopup('Ваш адрес').openPopup()
+      marker = L.marker([latitude, longitude]).addTo(map).bindPopup('Ваш адрес').openPopup();
     }
   } catch (error) {
-    console.error('Error checking address:', error)
+    console.error('Error checking address:', error);
   }
-}
+};
 
 const submitForm = async () => {
   try {
-    await masterClassesStore.createMasterClass(form.value)
-    alert('Мероприятие успешно создано')
+    await masterClassesStore.createMasterClass(form.value);
+    alert('Мероприятие успешно создано');
   } catch (error) {
-    console.error('Error creating master class:', error)
+    console.error('Error creating master class:', error);
   }
-}
+};
 </script>
 
 <style lang="scss" scoped>
@@ -317,15 +348,15 @@ const submitForm = async () => {
   border-radius: 20px;
   display: flex;
   align-items: center;
-}
 
-.category-chip button {
-  background: none;
-  border: none;
-  color: white;
-  margin-left: 10px;
-  cursor: pointer;
-  font-size: 16px;
+  button {
+    background: none;
+    border: none;
+    color: white;
+    margin-left: 10px;
+    cursor: pointer;
+    font-size: 16px;
+  }
 }
 
 label {

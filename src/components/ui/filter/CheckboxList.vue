@@ -1,3 +1,5 @@
+
+<!-- src\components\ui\filter\CheckboxList.vue-->
 <template>
   <div class="filter-dropdown" @mouseleave="closeDropdown" :class="{ inline: inline }">
     <template v-if="inline">

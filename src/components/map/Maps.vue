@@ -1,4 +1,3 @@
-<!-- src\components\map\Maps.vue -->
 <template>
   <div class="main-container">
     <Nav @openAuthModal="toggleModal" />
@@ -33,15 +32,13 @@ import { useLayersStore } from "@/stores/layersStore";
 import ListViewMasterClasses from "@/components/map/ListViewMasterClasses.vue";
 import Timeline from "@/components/map/Timeline.vue";
 import Nav from "@/components/ui/navigation/Nav.vue";
-import AuthModal from "@/components/ui/auth/AuthModal.vue";
+import AuthModal from "@/components/ui/auth/LoginPage.vue";
 import LayerToggleButton from "@/components/map/LayerToggleButton.vue";
 
 const store = useMasterClassesStore();
 const layersStore = useLayersStore();
 const displayedMasterClasses = ref<any[]>([]);
 const isModalOpen = ref(false);
-const perPage = 10;
-let currentPage = 1;
 let userMarker: any = null;
 
 const myIcon = L.icon({
@@ -73,25 +70,12 @@ function handleDataChange({ startDate, interval, mode }: { startDate: Date, inte
     const mcDate = new Date(mc.start_date);
     return mode === 'накопительно' ? mcDate <= endDate : mcDate >= startDate && mcDate <= endDate;
   });
-  currentPage = 1;
-  loadMoreClasses();
   layersStore.toggleLayer(layersStore.activeLayerIndex, displayedMasterClasses.value, myIcon);
 }
 
 function showAll() {
   displayedMasterClasses.value = store.masterClasses;
-  currentPage = 1;
-  loadMoreClasses();
   layersStore.toggleLayer(layersStore.activeLayerIndex, displayedMasterClasses.value, myIcon);
-}
-
-function loadMoreClasses() {
-  const start = (currentPage - 1) * perPage;
-  const end = currentPage * perPage;
-  const newClasses = displayedMasterClasses.value.slice(start, end);
-
-  displayedMasterClasses.value = [...displayedMasterClasses.value, ...newClasses];
-  currentPage++;
 }
 
 function initializeMap(center: [number, number]) {
@@ -110,21 +94,20 @@ function initializeMap(center: [number, number]) {
   layersStore.toggleLayer(0, displayedMasterClasses.value, myIcon);
 }
 
-onMounted(() => {
-  store.fetchMasterClasses().then(() => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(position => {
-        const { latitude, longitude } = position.coords;
-        initializeMap([latitude, longitude]);
-      }, () => {
-        alert("Не удалось получить ваше местоположение.");
-        initializeMap([55.755819, 37.617644]); // Default to Moscow if geolocation fails
-      });
-    } else {
-      alert("Ваш браузер не поддерживает геолокацию.");
-      initializeMap([55.755819, 37.617644]); // Default to Moscow if geolocation is not supported
-    }
-  });
+onMounted(async () => {
+  await store.fetchAllMasterClasses(true); // Fetch all master classes with one request
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(position => {
+      const { latitude, longitude } = position.coords;
+      initializeMap([latitude, longitude]);
+    }, () => {
+      alert("Не удалось получить ваше местоположение.");
+      initializeMap([55.755819, 37.617644]); // Default to Moscow if geolocation fails
+    });
+  } else {
+    alert("Ваш браузер не поддерживает геолокацию.");
+    initializeMap([55.755819, 37.617644]); // Default to Moscow if geolocation is not supported
+  }
 });
 
 // Следим за изменениями в данных и обновляем маркеры
@@ -201,11 +184,6 @@ const toggleModal = () => {
   display: flex;
   flex-direction: column;
   gap: 10px;
-
-  .zoom-in, .zoom-out, .to-home {
-    //display: flex;
-    //align-items: center;
-  }
 
   button {
     width: 48px;

@@ -13,9 +13,9 @@
       <div class="navbar__filters">
         <a class="navbar__link" @click="goToMap">На карту</a>
       </div>
-
       <div class="navbar__actions">
-        <button class="navbar__button" @click="openAuthModal">Войти</button>
+        <button class="navbar__button" @click="goToLogin">Войти</button>
+        <button class="navbar__button" @click="goToRegister">Регистрация</button>
       </div>
       <div class="navbar__actions">
         <button class="navbar__button" @click="goToAddMasterClass">Добавить мастер-класс</button>
@@ -25,34 +25,36 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
-import { inject } from 'vue'
-import { useMasterClassesStore } from '@/stores/masterClasses'
+import { ref } from 'vue';
+import { useRouter } from 'vue-router';
+import { useMasterClassesStore } from '@/stores/masterClasses';
 
-const router = useRouter()
-const openAuthModal = inject('openAuthModal') as () => void
-const searchQuery = ref('')
-const masterClassesStore = useMasterClassesStore()
+const router = useRouter();
+const searchQuery = ref('');
+const masterClassesStore = useMasterClassesStore();
 
 const goToHome = () => {
-  router.push({ name: 'Home' })
-}
+  router.push({ name: 'Home' });
+};
 const goToMap = () => {
-  router.push({ name: 'Map' })
-}
-
+  router.push({ name: 'Map' });
+};
+const goToLogin = () => {
+  router.push({ name: 'Login' });
+};
+const goToRegister = () => {
+  router.push({ name: 'Register' });
+};
 const goToAddMasterClass = () => {
-  router.push({ name: 'AddMasterClass' })
-}
-
+  router.push({ name: 'AddMasterClass' });
+};
 const searchMasterClasses = async () => {
   try {
-    await masterClassesStore.searchMasterClassesByTitle(searchQuery.value)
+    await masterClassesStore.searchMasterClassesByTitle(searchQuery.value);
   } catch (error) {
-    console.error('Error searching master classes:', error)
+    console.error('Error searching master classes:', error);
   }
-}
+};
 </script>
 
 <style scoped lang="scss">
@@ -76,7 +78,6 @@ const searchMasterClasses = async () => {
   left: 0;
   z-index: 1000;
   height: 60px;
-  border-bottom: 1px solid $gray;
 
   &__container {
     width: 100%;
@@ -121,7 +122,7 @@ const searchMasterClasses = async () => {
       color: $white;
       cursor: pointer;
       font-size: 14px;
-      margin-left: 200px;
+      margin-left: 10px;
 
       &:hover {
         background-color: darken($green, 10%);

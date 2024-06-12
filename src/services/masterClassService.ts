@@ -4,7 +4,7 @@ import axios from 'axios';
 const BASE_URL = 'http://127.0.0.1:8000/api';
 
 // get masterclasses {{BASE_URL}}/masterclasses
-export const fetchMasterClasses = async (categories = [], cities = [], startDate = null, endDate = null) => {
+export const fetchMasterClasses = async (categories = [], cities = [], startDate = null, endDate = null, fetchAll = false) => {
   try {
     const params = new URLSearchParams();
     categories.forEach(category => params.append('categories', category.toString()));
@@ -16,8 +16,24 @@ export const fetchMasterClasses = async (categories = [], cities = [], startDate
       params.append('end_date', endDate.toISOString());
     }
 
-    const response = await axios.get(`${BASE_URL}/masterclasses/`, { params });
-    return response.data;
+    const fetchPage = async (url) => {
+      const response = await axios.get(url, { params });
+      return response.data;
+    };
+
+    let data = [];
+    let url = `${BASE_URL}/masterclasses/`;
+    let response = await fetchPage(url);
+    data = response.results;
+
+    if (fetchAll) {
+      while (response.next) {
+        response = await fetchPage(response.next);
+        data = data.concat(response.results);
+      }
+    }
+
+    return data;
   } catch (error) {
     console.error('Error fetching master classes:', error);
     throw error;
@@ -25,9 +41,9 @@ export const fetchMasterClasses = async (categories = [], cities = [], startDate
 };
 
 // get organizers {{BASE_URL}}/users/organizers
-export const fetchOrganizers= async () => {
+export const fetchOrganizers = async () => {
   try {
-    const response = await axios.get(`${BASE_URL}/users/organizers`);
+    const response = await axios.get(`${BASE_URL}/users/organizers/`);
     return response.data;
   } catch (error) {
     console.error('Error fetching organizers:', error);
@@ -38,7 +54,7 @@ export const fetchOrganizers= async () => {
 // get speakers {{BASE_URL}}/users/speakers
 export const fetchSpeakers = async () => {
   try {
-    const response = await axios.get(`${BASE_URL}/users/speakers`);
+    const response = await axios.get(`${BASE_URL}/users/speakers/`);
     return response.data;
   } catch (error) {
     console.error('Error fetching speakers:', error);
@@ -49,7 +65,7 @@ export const fetchSpeakers = async () => {
 // get categories {{BASE_URL}}/masterclasses/categories
 export const fetchCategories = async () => {
   try {
-    const response = await axios.get(`${BASE_URL}/masterclasses/categories`);
+    const response = await axios.get(`${BASE_URL}/masterclasses/categories/`);
     return response.data;
   } catch (error) {
     console.error('Error fetching categories:', error);
@@ -60,7 +76,7 @@ export const fetchCategories = async () => {
 // get cities {{BASE_URL}}/masterclasses/cities
 export const fetchCities = async () => {
   try {
-    const response = await axios.get(`${BASE_URL}/masterclasses/cities`);
+    const response = await axios.get(`${BASE_URL}/masterclasses/cities/`);
     return response.data;
   } catch (error) {
     console.error('Error fetching cities:', error);
@@ -84,13 +100,14 @@ export const searchMasterClassesByTitle = async (title: string) => {
 // create masterclass {{BASE_URL}}/masterclasses
 export const createMasterClassAPI = async (masterClass) => {
   try {
-    // Вывод JSON объекта masterClass в консоль
     console.log('Creating master class with data:', JSON.stringify(masterClass, null, 2));
 
     const formData = new FormData();
     Object.keys(masterClass).forEach(key => {
-      if (Array.isArray(masterClass[key])) {
+      if (key === 'categories') {
         masterClass[key].forEach(value => formData.append(key, value));
+      } else if (key === 'image_url' && masterClass[key]) {
+        formData.append('image_url', masterClass[key], masterClass[key].name);
       } else {
         formData.append(key, masterClass[key]);
       }
@@ -111,10 +128,21 @@ export const createMasterClassAPI = async (masterClass) => {
 // geocode address {{BASE_URL}}/gis/geocode
 export const geocodeAddress = async (locationName: string) => {
   try {
-    const response = await axios.get(`${BASE_URL}/gis/geocode`, { params: { location_name: locationName } });
+    const response = await axios.get(`${BASE_URL}/gis/geocode/`, { params: { location_name: locationName } });
     return response.data;
   } catch (error) {
     console.error('Error fetching geocode data:', error);
+    throw error;
+  }
+};
+
+// reverse geocode coordinates {{BASE_URL}}/gis/reverse-geocode
+export const reverseGeocodeCoordinates = async (longitude: number, latitude: number) => {
+  try {
+    const response = await axios.get(`${BASE_URL}/gis/reverse-geocode/`, { params: { longitude, latitude } });
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching reverse geocode data:', error);
     throw error;
   }
 };
