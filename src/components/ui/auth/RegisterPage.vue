@@ -1,4 +1,4 @@
-<!-- src/components/ui/auth/RegisterPage.vue-->
+<!-- src/components/ui/auth/RegisterPage.vue -->
 <template>
   <div class="auth-page-wrapper">
     <div class="auth-page">
@@ -14,10 +14,10 @@
           <input id="password" v-model="registerForm.password" type="password" placeholder="Пароль" required />
         </div>
         <div class="form-item">
-          <input id="firstName" v-model="registerForm.firstName" type="text" placeholder="Имя" required />
+          <input id="firstName" v-model="registerForm.first_name" type="text" placeholder="Имя" required />
         </div>
         <div class="form-item">
-          <input id="lastName" v-model="registerForm.lastName" type="text" placeholder="Фамилия" required />
+          <input id="lastName" v-model="registerForm.last_name" type="text" placeholder="Фамилия" required />
         </div>
         <div class="form-item radio-group">
           <label>
@@ -28,26 +28,26 @@
           </label>
         </div>
         <div class="form-item">
-          <button type="submit" class="primary-btn">Зарегистрироваться</button>
+          <button type="submit" class="primary-btn" :disabled="loading">Зарегистрироваться</button>
         </div>
       </form>
-      <div class="page-footer">
-        <span>Уже есть аккаунт? <router-link to="/login" class="text-btn">Войти</router-link></span>
-      </div>
+      <div v-if="loading" class="loading-spinner"></div>
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
 import { ref, reactive } from 'vue';
+import { useRouter } from 'vue-router';
 import { useUserStore } from '@/stores/userStore';
+import { useToast } from "@/composables/useToast";
 
 interface RegisterForm {
   username: string;
   email: string;
   password: string;
-  firstName: string;
-  lastName: string;
+  first_name: string;
+  last_name: string;
   role: string;
 }
 
@@ -55,35 +55,54 @@ const registerForm = reactive<RegisterForm>({
   username: '',
   email: '',
   password: '',
-  firstName: '',
-  lastName: '',
+  first_name: '',
+  last_name: '',
   role: '5'
 });
 
 const registerFormRef = ref<HTMLFormElement | null>(null);
 const userStore = useUserStore();
+const router = useRouter();
+const { showToast } = useToast();
+const loading = ref(false);
 
 const handleRegister = async () => {
+  loading.value = true;
   try {
     await userStore.register(registerForm);
-    alert('Успешная регистрация');
+    showToast('Успешная регистрация! Пожалуйста, подтвердите свой аккаунт на почте.', 'success');
     resetForm();
-  } catch (error) {
-    alert('Ошибка регистрации');
+    setTimeout(() => {
+      router.push('/login');
+    }, 2000); // Задержка в 2 секунды перед переадресацией
+  } catch (error: any) {
+    if (error.response) {
+      console.error('Ошибка регистрации:', error.response.data);
+      showToast(`Ошибка регистрации: ${error.response.data.message}`, 'error');
+    } else {
+      console.error('Ошибка регистрации:', error.message);
+      showToast(`Ошибка регистрации: ${error.message}`, 'error');
+    }
+  } finally {
+    loading.value = false;
   }
+};
+
+const goToLogin = () => {
+  router.push('/login');
 };
 
 const resetForm = () => {
   registerForm.username = '';
   registerForm.email = '';
   registerForm.password = '';
-  registerForm.firstName = '';
-  registerForm.lastName = '';
+  registerForm.first_name = '';
+  registerForm.last_name = '';
   registerForm.role = '5';
 };
 </script>
 
-<style lang="scss" scoped>
+<style scoped lang="scss">
 @import "@/assets/variables";
 .auth-page-wrapper {
   background-color: #f0f5fa;
@@ -194,18 +213,26 @@ const resetForm = () => {
   &:hover {
     background-color: $color-primary-hover;
   }
+
+  &:disabled {
+    background-color: lighten($color-primary, 20%);
+    cursor: not-allowed;
+  }
 }
 
-.text-btn {
-  background: none;
-  border: none;
-  color: $color-primary;
-  padding: 0;
-  cursor: pointer;
-  font-size: 16px;
+.loading-spinner {
+  border: 4px solid rgba(0, 0, 0, 0.1);
+  border-left-color: $color-primary;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+  margin: 20px auto;
+}
 
-  &:hover {
-    color: $color-primary-hover;
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
   }
 }
 </style>

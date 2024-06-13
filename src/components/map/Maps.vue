@@ -1,3 +1,4 @@
+<!-- src/components/map/Maps.vue -->
 <template>
   <div class="main-container">
     <Nav @openAuthModal="toggleModal" />
@@ -32,7 +33,7 @@ import { useLayersStore } from "@/stores/layersStore";
 import ListViewMasterClasses from "@/components/map/ListViewMasterClasses.vue";
 import Timeline from "@/components/map/Timeline.vue";
 import Nav from "@/components/ui/navigation/Nav.vue";
-import AuthModal from "@/components/ui/auth/LoginPage.vue";
+import AuthModal from "@/components/ui/auth/LoginModal.vue";
 import LayerToggleButton from "@/components/map/LayerToggleButton.vue";
 
 const store = useMasterClassesStore();

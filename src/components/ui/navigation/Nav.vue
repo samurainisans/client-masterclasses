@@ -1,3 +1,4 @@
+<!-- src/components/ui/navigation/Nav.vue -->
 <template>
   <nav class="navbar">
     <div class="navbar__container">
@@ -14,40 +15,57 @@
         <a class="navbar__link" @click="goToMap">На карту</a>
       </div>
       <div class="navbar__actions">
-        <button class="navbar__button" @click="goToLogin">Войти</button>
-        <button class="navbar__button" @click="goToRegister">Регистрация</button>
+        <button class="navbar__button" @click="openAuthModal">Войти</button>
       </div>
       <div class="navbar__actions">
         <button class="navbar__button" @click="goToAddMasterClass">Добавить мастер-класс</button>
       </div>
     </div>
+    <LoginModal :visible="isLoginModalVisible" @close="closeLoginModal" />
   </nav>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { useMasterClassesStore } from '@/stores/masterClasses';
+import { useUserStore } from '@/stores/userStore';
+import LoginModal from '@/components/ui/auth/LoginModal.vue';
 
 const router = useRouter();
 const searchQuery = ref('');
 const masterClassesStore = useMasterClassesStore();
+const userStore = useUserStore();
+const isLoginModalVisible = ref(false);
+
+const user = computed(() => userStore.user);
+
+const openAuthModal = () => {
+  isLoginModalVisible.value = true;
+};
+
+const closeLoginModal = () => {
+  isLoginModalVisible.value = false;
+};
+
+const logout = () => {
+  userStore.user = null;
+  userStore.accessToken = null;
+  userStore.refreshToken = null;
+};
 
 const goToHome = () => {
   router.push({ name: 'Home' });
 };
+
 const goToMap = () => {
   router.push({ name: 'Map' });
 };
-const goToLogin = () => {
-  router.push({ name: 'Login' });
-};
-const goToRegister = () => {
-  router.push({ name: 'Register' });
-};
+
 const goToAddMasterClass = () => {
   router.push({ name: 'AddMasterClass' });
 };
+
 const searchMasterClasses = async () => {
   try {
     await masterClassesStore.searchMasterClassesByTitle(searchQuery.value);
@@ -127,6 +145,12 @@ const searchMasterClasses = async () => {
       &:hover {
         background-color: darken($green, 10%);
       }
+    }
+
+    .navbar__user {
+      margin-right: 10px;
+      font-size: 14px;
+      color: $green;
     }
   }
 }
