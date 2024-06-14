@@ -2,9 +2,15 @@
 
 Этот шаблон поможет вам начать разработку с использованием Vue 3 и Vite.
 
+## Установка необходимых инструментов
+
+1. Установите [Node.js](https://nodejs.org/) с официального сайта.
+2. Скачайте и установите [Visual Studio Code](https://code.visualstudio.com/) или [WebStorm](https://www.jetbrains.com/webstorm/).
+
 ## Рекомендуемая настройка IDE
 
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (и отключить Vetur).
+Если вы выбрали Visual Studio Code:
+- Установите расширение [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (и отключите Vetur).
 
 ## Поддержка типов для `.vue` импортов в TypeScript
 
