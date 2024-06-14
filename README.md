@@ -1,41 +1,39 @@
 # vue-client-masterclass
 
-This template should help get you started developing with Vue 3 in Vite.
+Этот шаблон поможет вам начать разработку с использованием Vue 3 и Vite.
 
-## Recommended IDE Setup
+## Рекомендуемая настройка IDE
 
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
+[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (и отключить Vetur).
 
-## Type Support for `.vue` Imports in TS
+## Поддержка типов для `.vue` импортов в TypeScript
 
-TypeScript cannot handle type information for `.vue` imports by default, so we replace the `tsc` CLI with `vue-tsc` for type checking. In editors, we need [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) to make the TypeScript language service aware of `.vue` types.
+TypeScript по умолчанию не может обрабатывать типы для импортов `.vue`, поэтому мы заменяем `tsc` CLI на `vue-tsc` для проверки типов. В редакторах нам нужен [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar), чтобы TypeScript язык понимал типы `.vue`.
 
-## Customize configuration
+## Настройка конфигурации
 
-See [Vite Configuration Reference](https://vitejs.dev/config/).
+Смотрите [Vite Configuration Reference](https://vitejs.dev/config/).
 
-## Project Setup
+## Настройка проекта
 
 ```sh
 npm install
 ```
 
-### Compile and Hot-Reload for Development
+### Компиляция и горячая перезагрузка для разработки
 
 ```sh
 npm run dev
 ```
 
-### Type-Check, Compile and Minify for Production
+### Проверка типов, компиляция и минификация для продакшена
 
 ```sh
 npm run build
 ```
 
-### Lint with [ESLint](https://eslint.org/)
+### Линтинг с помощью [ESLint](https://eslint.org/)
 
 ```sh
 npm run lint
 ```
-# client-masterclasses
-# client-masterclasses
