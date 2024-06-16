@@ -6,7 +6,13 @@
       <h3 class="modal-title">Вход</h3>
       <form @submit.prevent="handleLogin" ref="loginFormRef">
         <div class="form-item">
-          <input id="username" v-model="loginForm.username" type="text" placeholder="Логин" required />
+          <input
+            id="username"
+            v-model="loginForm.username"
+            type="text"
+            placeholder="Логин"
+            required
+          />
         </div>
         <div class="form-item password-item">
           <input
@@ -35,75 +41,76 @@
 </template>
 
 <script lang="ts" setup>
-import { ref } from 'vue';
-import { useRouter } from 'vue-router';
-import { useUserStore } from '@/stores/userStore';
-import { useToast } from "@/composables/useToast";
+import { ref } from 'vue'
+import { useRouter } from 'vue-router'
+import { useUserStore } from '@/stores/userStore'
+import { useToast } from '@/composables/useToast'
 
 interface LoginForm {
-  username: string;
-  password: string;
+  username: string
+  password: string
 }
 
 const props = defineProps({
   visible: Boolean
-});
+})
 
-const emit = defineEmits(['close']);
+const emit = defineEmits(['close'])
 
 const loginForm = ref<LoginForm>({
   username: '',
   password: ''
-});
+})
 
-const loginFormRef = ref<HTMLFormElement | null>(null);
-const userStore = useUserStore();
-const router = useRouter();
-const { showToast } = useToast();
-const loading = ref(false);
-const showPassword = ref(false);
+const loginFormRef = ref<HTMLFormElement | null>(null)
+const userStore = useUserStore()
+const router = useRouter()
+const { showToast } = useToast()
+const loading = ref(false)
+const showPassword = ref(false)
 
 const handleLogin = async () => {
-  loading.value = true;
+  loading.value = true
   try {
-    await userStore.login(loginForm.value);
-    showToast('Успешный вход!', 'success');
-    closeModal();
+    await userStore.login(loginForm.value)
+    showToast('Успешный вход!', 'success')
+    closeModal()
+    await router.push({ name: 'Profile' })
   } catch (error: any) {
     if (error.response) {
       if (error.response.status === 403) {
-        showToast('Аккаунт не активирован. Проверьте почту для подтверждения.', 'error');
+        showToast('Аккаунт не активирован. Проверьте почту для подтверждения.', 'error')
       } else if (error.response.status === 401) {
-        showToast('Неверные учетные данные.', 'error');
+        showToast('Неверные учетные данные.', 'error')
       } else {
-        showToast(`Ошибка входа: ${error.response.data.error}`, 'error');
+        showToast(`Ошибка входа: ${error.response.data.error}`, 'error')
       }
     } else {
-      console.error('Ошибка входа:', error.message);
-      showToast(`Ошибка входа: ${error.message}`, 'error');
+      console.error('Ошибка входа:', error.message)
+      showToast(`Ошибка входа: ${error.message}`, 'error')
     }
   } finally {
-    loading.value = false;
+    loading.value = false
   }
-};
+}
 
 const closeModal = () => {
-  emit('close');
-};
+  emit('close')
+}
 
 const goToRegister = () => {
-  closeModal();
-  router.push({ name: 'Register' });
-};
+  closeModal()
+  router.push({ name: 'Register' })
+}
 
 const recoverPassword = () => {
-  closeModal();
-  router.push({ name: 'RecoverPassword' }); // Предполагается, что у вас есть маршрут для восстановления пароля
-};
+  closeModal()
+  router.push({ name: 'RecoverPassword' })
+}
 
 const togglePasswordVisibility = () => {
-  showPassword.value = !showPassword.value;
-};
+  showPassword.value = !showPassword.value
+}
 </script>
 
 <style scoped lang="scss">
@@ -151,8 +158,8 @@ const togglePasswordVisibility = () => {
   display: flex;
   flex-direction: column;
 
-  input[type="text"],
-  input[type="password"] {
+  input[type='text'],
+  input[type='password'] {
     background-color: $color-background;
     border: 1px solid $color-border;
     border-radius: 4px;

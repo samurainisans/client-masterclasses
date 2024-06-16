@@ -2,7 +2,7 @@
 import { defineStore } from 'pinia'
 import {
   fetchMasterClasses,
-  fetchMasterClassById, // добавляем импорт
+  fetchMasterClassById,
   searchMasterClassesByTitle,
   createMasterClassAPI,
   fetchCategories,
