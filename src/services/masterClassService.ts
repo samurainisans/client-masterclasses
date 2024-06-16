@@ -40,6 +40,28 @@ export const fetchMasterClasses = async (categories = [], cities = [], startDate
   }
 };
 
+export const fetchMasterClassesByCity = async (city: string) => {
+  try {
+    const response = await axios.get(`${BASE_URL}/masterclasses/by_city/?locality=${city}`);
+    return response.data;
+  } catch (error) {
+    console.error('Не удалось загрузить мастер-классы по городу', error);
+    throw error;
+  }
+};
+
+
+// метод для получения конкретного мастер-класса
+export const fetchMasterClassById = async (id: number) => {
+  try {
+    const response = await axios.get(`${BASE_URL}/masterclasses/${id}/`);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching master class:', error);
+    throw error;
+  }
+};
+
 // get organizers {{BASE_URL}}/users/organizers
 export const fetchOrganizers = async () => {
   try {

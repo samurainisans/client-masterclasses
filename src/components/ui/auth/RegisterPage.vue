@@ -21,7 +21,7 @@
         </div>
         <div class="form-item radio-group">
           <label>
-            <input type="radio" v-model="registerForm.role" value="5" /> Участник
+            <input type="radio" v-model="registerForm.role" value="4" /> Участник
           </label>
           <label>
             <input type="radio" v-model="registerForm.role" value="2" /> Организатор
@@ -57,7 +57,7 @@ const registerForm = reactive<RegisterForm>({
   password: '',
   first_name: '',
   last_name: '',
-  role: '5'
+  role: '4'
 });
 
 const registerFormRef = ref<HTMLFormElement | null>(null);
@@ -98,7 +98,7 @@ const resetForm = () => {
   registerForm.password = '';
   registerForm.first_name = '';
   registerForm.last_name = '';
-  registerForm.role = '5';
+  registerForm.role = '4';
 };
 </script>
 

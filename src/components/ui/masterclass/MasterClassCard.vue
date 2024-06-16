@@ -1,15 +1,26 @@
+<!-- src/components/ui/masterclass/MasterClassCard.vue -->
 <template>
-  <div class="card" @click="handleCardClick">
+  <div class="card">
     <div class="image-container">
-      <img :src="masterClass.image_url || '/default-image.jpg'" alt="image" class="card-image">
-      <button class="favorite-btn"><img src="/src/assets/imgs/favorite.svg" alt="favorite"></button>
+      <img :src="masterClass.image_url || '/default-image.jpg'" alt="image" class="card-image" />
+      <button class="favorite-btn" @click.stop>
+        <img src="/src/assets/imgs/favorite.svg" alt="favorite" />
+      </button>
     </div>
     <div class="card-content">
       <div class="categories">
         <span class="category-chip">{{ mainCategory }}</span>
-        <span v-if="extraCategoriesCount > 0" class="extra-categories" @click.stop="showAllCategories">{{ extraCategoriesCount }}+</span>
+        <span
+          v-if="extraCategoriesCount > 0"
+          class="extra-categories"
+          @click.stop="showAllCategories"
+        >{{ extraCategoriesCount }}+</span>
       </div>
-      <h3>{{ masterClass.title }}</h3>
+      <h3>
+        <router-link :to="{ name: 'MasterClassDetail', params: { id: masterClass.id } }">
+          {{ masterClass.title }}
+        </router-link>
+      </h3>
       <p class="description">{{ masterClass.description }}</p>
       <div class="date-time">
         {{ formattedDateTime }}
@@ -25,16 +36,19 @@
         </div>
         <div class="modal-body">
           <div class="all-categories">
-            <span class="category-chip" v-for="category in masterClass.categories" :key="category.id">{{ category.name }}</span>
+            <span
+              class="category-chip"
+              v-for="category in masterClass.categories"
+              :key="category.id"
+            >{{ category.name }}</span>
           </div>
         </div>
       </div>
     </div>
   </div>
 </template>
-
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import { ref, computed } from 'vue'
 
 const props = defineProps({
   masterClass: {
@@ -42,41 +56,35 @@ const props = defineProps({
     required: true,
     default: () => ({})
   }
-});
-
-const isModalOpen = ref(false);
+})
+const isModalOpen = ref(false)
 
 const formattedDateTime = computed(() => {
-  if (!props.masterClass.start_date || !props.masterClass.end_date) return '';
+  if (!props.masterClass.start_date || !props.masterClass.end_date) return ''
 
-  const startDate = new Date(props.masterClass.start_date);
-  const endDate = new Date(props.masterClass.end_date);
-  const options = { month: 'long', day: 'numeric' };
-  const startTime = startDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-  const endTime = endDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-  return `${startDate.toLocaleDateString('ru-RU', options)}, с ${startTime} до ${endTime} по местному времени`;
-});
+  const startDate = new Date(props.masterClass.start_date)
+  const endDate = new Date(props.masterClass.end_date)
+  const options = { month: 'long', day: 'numeric' }
+  const startTime = startDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+  const endTime = endDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+  return `${startDate.toLocaleDateString('ru-RU', options)}, с ${startTime} до ${endTime} по местному времени`
+})
 
 const mainCategory = computed(() => {
-  return props.masterClass.categories[0]?.name || '';
-});
+  return props.masterClass.categories[0]?.name || ''
+})
 
 const extraCategoriesCount = computed(() => {
-  return props.masterClass.categories.length - 1;
-});
-
-const handleCardClick = () => {
-  // Логика для обработки клика на карточке
-  console.log(`Clicked on master class: ${props.masterClass.title}`);
-};
+  return props.masterClass.categories.length - 1
+})
 
 const showAllCategories = () => {
-  isModalOpen.value = true;
-};
+  isModalOpen.value = true
+}
 </script>
 
 <style scoped lang="scss">
-@import "@/assets/variables";
+@import '@/assets/variables';
 
 .card {
   background-color: $white;
@@ -85,12 +93,14 @@ const showAllCategories = () => {
   overflow: hidden;
   margin: 15px;
   width: 400px;
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
+  position: relative;
   cursor: pointer;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  position: relative; /* Добавляем относительное позиционирование для карточки */
 
   &:hover {
-    transform: translateY(-5px);
+    transform: translateY(-3px);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   }
 
@@ -147,7 +157,10 @@ const showAllCategories = () => {
         color: $green;
         border: 1px solid #366159;
         border-radius: 50%;
-        transition: background-color 0.3s ease, color 0.3s ease;
+        transition:
+          background-color 0.3s ease,
+          color 0.3s ease;
+
         &:hover {
           background-color: $green;
           color: $white;
@@ -157,6 +170,16 @@ const showAllCategories = () => {
 
     h3 {
       margin-bottom: 10px;
+      transition: color 0.3s ease;
+
+      &:hover {
+        color: $green;
+      }
+    }
+
+
+    a{
+      text-decoration: none;
     }
 
     .description {

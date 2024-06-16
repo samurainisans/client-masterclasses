@@ -1,3 +1,4 @@
+<!-- src/components/ui/IndexPage.vue -->
 <template>
   <div class="main-container">
     <Nav />
