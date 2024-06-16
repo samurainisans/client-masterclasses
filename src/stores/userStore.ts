@@ -2,11 +2,11 @@
 import { defineStore } from 'pinia';
 import { userService, parseJwt } from '@/services/usersService';
 import { ref } from 'vue';
+import Cookies from 'js-cookie';
 
 export const useUserStore = defineStore('user', () => {
   const user = ref(null);
-  const accessToken = ref(localStorage.getItem('access_token'));
-  const refreshToken = ref(localStorage.getItem('refresh_token'));
+  const accessToken = ref(Cookies.get('access_token') || null);
   const isAuthenticated = ref(!!accessToken.value);
 
   const register = async (userData: any) => {
@@ -22,8 +22,9 @@ export const useUserStore = defineStore('user', () => {
     try {
       const response = await userService.login(credentials);
       if (response && response.access && response.refresh) {
+        Cookies.set('access_token', response.access, { secure: true });
+        Cookies.set('refresh_token', response.refresh, { secure: true });
         accessToken.value = response.access;
-        refreshToken.value = response.refresh;
         isAuthenticated.value = true;
 
         const decodedToken = parseJwt(response.access);
@@ -39,27 +40,37 @@ export const useUserStore = defineStore('user', () => {
 
   const fetchUserInfo = async (userId: number) => {
     try {
-      const data = await userService.getUserInfo(userId);
-      user.value = data;
+      const response = await userService.getUserInfo(userId);
+      user.value = response.data;  // Сохраняем данные пользователя
     } catch (error) {
       throw error;
+    }
+  };
+
+  const checkUser = async () => {
+    if (!user.value && accessToken.value) {
+      const decodedToken = parseJwt(accessToken.value);
+      await fetchUserInfo(decodedToken.user_id);
     }
   };
 
   const logout = () => {
     userService.logout();
     user.value = null;
+    accessToken.value = null;
     isAuthenticated.value = false;
+    Cookies.remove('access_token');
+    Cookies.remove('refresh_token');
   };
 
   return {
     user,
     accessToken,
-    refreshToken,
     isAuthenticated,
     register,
     login,
     fetchUserInfo,
+    checkUser,
     logout,
   };
 });

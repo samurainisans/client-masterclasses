@@ -11,14 +11,36 @@
           @keyup.enter="searchMasterClasses"
         />
       </div>
-      <div class="navbar__filters">
-        <a class="navbar__link" @click="goToMap">На карту</a>
-      </div>
+      <AuthGuard :roles="['Organizer', 'Admin']">
+        <div class="navbar__filters">
+          <a class="navbar__link" @click="goToMap">На карту</a>
+        </div>
+      </AuthGuard>
       <div class="navbar__actions">
-        <button class="navbar__button" @click="openAuthModal">Войти</button>
-      </div>
-      <div class="navbar__actions">
-        <button class="navbar__button" @click="goToAddMasterClass">Добавить мастер-класс</button>
+        <img
+          v-if="!isAuthenticated"
+          class="navbar__icon"
+          src="@/assets/imgs/LogOutIcon.svg"
+          @click="openAuthModal"
+          alt="Login"
+          title="Войти"
+        />
+        <AuthGuard :roles="['Organizer', 'Admin']">
+          <button class="navbar__button" @click="goToAddMasterClass" title="Добавить мастер-класс">
+            Добавить мастер-класс
+          </button>
+        </AuthGuard>
+        <div class="navbar__profile-wrapper">
+          <img
+            v-if="isAuthenticated"
+            class="navbar__profile-icon"
+            src="@/assets/imgs/ProfileIcon.svg"
+            @click="toggleProfileModal"
+            alt="Profile"
+            title="Профиль"
+          />
+          <ProfileModal v-if="isProfileModalVisible && isAuthenticated" @close="toggleProfileModal" />
+        </div>
       </div>
     </div>
     <LoginModal :visible="isLoginModalVisible" @close="closeLoginModal" />
@@ -26,19 +48,23 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import { ref, computed, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import { useMasterClassesStore } from '@/stores/masterClasses';
 import { useUserStore } from '@/stores/userStore';
 import LoginModal from '@/components/ui/auth/LoginModal.vue';
+import AuthGuard from "@/components/ui/permission/AuthGuard.vue";
+import ProfileModal from "@/components/ui/user/ProfileModal.vue";
 
 const router = useRouter();
 const searchQuery = ref('');
 const masterClassesStore = useMasterClassesStore();
 const userStore = useUserStore();
 const isLoginModalVisible = ref(false);
+const isProfileModalVisible = ref(false);
 
 const user = computed(() => userStore.user);
+const isAuthenticated = computed(() => userStore.isAuthenticated);
 
 const openAuthModal = () => {
   isLoginModalVisible.value = true;
@@ -48,11 +74,16 @@ const closeLoginModal = () => {
   isLoginModalVisible.value = false;
 };
 
-const logout = () => {
-  userStore.user = null;
-  userStore.accessToken = null;
-  userStore.refreshToken = null;
+const toggleProfileModal = () => {
+  isProfileModalVisible.value = !isProfileModalVisible.value;
 };
+
+// наблюдение за состоянием аутентификации, чтобы закрыть модальное окно профиля при выходе
+watch(isAuthenticated, (newVal) => {
+  if (!newVal) {
+    isProfileModalVisible.value = false;
+  }
+});
 
 const goToHome = () => {
   router.push({ name: 'Home' });
@@ -132,6 +163,17 @@ const searchMasterClasses = async () => {
     display: flex;
     align-items: center;
 
+    .navbar__icon {
+      height: 40px;
+      cursor: pointer;
+      margin-left: 10px;
+      transition: transform 0.3s ease;
+
+      &:hover {
+        transform: scale(1.1);
+      }
+    }
+
     .navbar__button {
       padding: 10px 20px;
       border: none;
@@ -147,10 +189,20 @@ const searchMasterClasses = async () => {
       }
     }
 
-    .navbar__user {
-      margin-right: 10px;
-      font-size: 14px;
-      color: $green;
+    .navbar__profile-wrapper {
+      position: relative;
+      display: inline-block;
+    }
+
+    .navbar__profile-icon {
+      height: 40px;
+      margin-left: 10px;
+      cursor: pointer;
+      transition: transform 0.3s ease;
+
+      &:hover {
+        transform: scale(1.1);
+      }
     }
   }
 }

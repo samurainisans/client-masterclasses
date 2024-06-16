@@ -1,6 +1,9 @@
 <!-- src/components/ui/filter/FiltrationComponent.vue -->
 <template>
   <div class="filter_container">
+    <AuthGuard :roles="['Organizer', 'Admin']">
+      <button class="add_ms_button" @click="goToAddMasterClass">Добавить мастер-класс</button>
+    </AuthGuard>
     <div class="filter_section">
       <CheckboxList
         :items="categoryItems"
@@ -40,6 +43,8 @@ import { useMasterClassesStore } from '@/stores/masterClasses';
 import DatePicker from '@/components/ui/filter/DatePicker.vue';
 import CheckboxList from '@/components/ui/filter/CheckboxList.vue';
 import { fetchCategories, fetchCities } from '@/services/masterClassService';
+import AuthGuard from "@/components/ui/permission/AuthGuard.vue";
+import router from "@/routes";
 
 const categoryItems = ref<{ value: number; label: string }[]>([]);
 const cityItems = ref<{ value: string; label: string }[]>([]);
@@ -48,6 +53,10 @@ const store = useMasterClassesStore();
 
 const selectedCategories = ref<number[]>([]);
 const selectedCities = ref<string[]>([]);
+
+const goToAddMasterClass = () => {
+  router.push({ name: 'AddMasterClass' });
+};
 
 const loadItems = async () => {
   try {
@@ -149,6 +158,23 @@ watch([selectedCategories, selectedCities, store.startDate, store.endDate], save
   gap: 50px;
   padding: 20px;
   justify-content: center;
+}
+
+.add_ms_button{
+  max-height: 40px;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  background-color: $green;
+  color: $white;
+  cursor: pointer;
+  font-size: 14px;
+  margin-left: 10px;
+  transition: background-color 0.3s ease;
+
+  &:hover {
+    background-color: darken($green, 10%);
+  }
 }
 
 .filter_section {
