@@ -7,6 +7,7 @@ import RegisterPage from "@/components/ui/auth/RegisterPage.vue";
 import MasterClassDetail from "@/components/ui/masterclass/MasterClassDetail.vue";
 import UserProfile from "@/components/ui/user/UserProfile.vue";
 import Logout from "@/components/ui/auth/Logout.vue";
+import OrganizerMasterClasses from "@/components/ui/user/organizer/OrganizerMasterClasses.vue";
 
 const routes = [
   { path: "/", redirect: "/home" },
@@ -16,7 +17,8 @@ const routes = [
   { path: "/register", component: RegisterPage, name: "Register" },
   { path: "/masterclass/:id", component: MasterClassDetail, name: "MasterClassDetail" },
   { path: "/profile", component: UserProfile, name: "Profile" },
-  { path: "/logout", component: Logout, name: "Logout" }
+  { path: "/logout", component: Logout, name: "Logout" },
+  { path: "/my-masterclasses", component: OrganizerMasterClasses, name: "OrganizerMasterClasses" }
 ];
 
 const router = createRouter({

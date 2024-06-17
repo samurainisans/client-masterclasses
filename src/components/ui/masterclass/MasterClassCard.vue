@@ -1,10 +1,17 @@
-<!-- src/components/ui/masterclass/MasterClassCard.vue -->
 <template>
   <div class="card">
     <div class="image-container">
-      <img :src="masterClass.image_url || '/default-image.jpg'" alt="image" class="card-image" />
-      <button class="favorite-btn" @click.stop>
-        <img src="/src/assets/imgs/favorite.svg" alt="favorite" />
+      <img :src="fullImageUrl" alt="image" class="card-image" />
+      <button
+        class="favorite-btn"
+        @click.stop="toggleFavorite"
+        :class="{ 'is-favorite': isFavorite }"
+      >
+        <img
+          :src="isFavorite ? '/src/assets/imgs/favorited.svg' : '/src/assets/imgs/favorite.svg'"
+          alt="favorite"
+          class="favorite-icon"
+        />
       </button>
     </div>
     <div class="card-content">
@@ -47,40 +54,72 @@
     </div>
   </div>
 </template>
+
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed } from 'vue';
+import { useFavoritesStore } from '@/stores/favoritesStore';
+import { useToast } from '@/composables/useToast';
+import Cookies from 'js-cookie';
 
 const props = defineProps({
   masterClass: {
     type: Object,
     required: true,
-    default: () => ({})
-  }
-})
-const isModalOpen = ref(false)
+    default: () => ({}),
+  },
+});
+const isModalOpen = ref(false);
+const favoritesStore = useFavoritesStore();
+const { showToast } = useToast();
 
 const formattedDateTime = computed(() => {
-  if (!props.masterClass.start_date || !props.masterClass.end_date) return ''
+  if (!props.masterClass.start_date || !props.masterClass.end_date) return '';
 
-  const startDate = new Date(props.masterClass.start_date)
-  const endDate = new Date(props.masterClass.end_date)
-  const options = { month: 'long', day: 'numeric' }
-  const startTime = startDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-  const endTime = endDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-  return `${startDate.toLocaleDateString('ru-RU', options)}, с ${startTime} до ${endTime} по местному времени`
-})
+  const startDate = new Date(props.masterClass.start_date);
+  const endDate = new Date(props.masterClass.end_date);
+  const options = { month: 'long', day: 'numeric' };
+  const startTime = startDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  const endTime = endDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  return `${startDate.toLocaleDateString('ru-RU', options)}, с ${startTime} до ${endTime} по местному времени`;
+});
 
 const mainCategory = computed(() => {
-  return props.masterClass.categories[0]?.name || ''
-})
+  return props.masterClass.categories[0]?.name || '';
+});
 
 const extraCategoriesCount = computed(() => {
-  return props.masterClass.categories.length - 1
-})
+  return props.masterClass.categories.length - 1;
+});
 
 const showAllCategories = () => {
-  isModalOpen.value = true
-}
+  isModalOpen.value = true;
+};
+
+const isFavorite = computed(() => {
+  return favoritesStore.isFavorite(props.masterClass.id);
+});
+
+const BASE_URL = 'http://localhost:8000'; // Замените на ваш реальный базовый URL
+
+const fullImageUrl = computed(() => {
+  if (!props.masterClass.image_url) {
+    return '/default-image.jpg'; // Замените на ваш реальный URL по умолчанию
+  }
+  if (props.masterClass.image_url.startsWith('/')) {
+    return `${BASE_URL}${props.masterClass.image_url}`;
+  }
+  return props.masterClass.image_url;
+});
+
+const toggleFavorite = () => {
+  if (isFavorite.value) {
+    favoritesStore.removeFavorite(props.masterClass.id);
+    showToast('Удалено из избранного', 'error');
+  } else {
+    favoritesStore.addFavorite(props.masterClass.id);
+    showToast('Добавлено в избранное', 'success');
+  }
+};
 </script>
 
 <style scoped lang="scss">
@@ -109,10 +148,10 @@ const showAllCategories = () => {
     overflow: hidden;
 
     .card-image {
-      height: 256px;
       width: 100%;
+      height: 200px;
+      object-fit: cover;
     }
-
     .favorite-btn {
       position: absolute;
       top: 10px;
@@ -120,10 +159,15 @@ const showAllCategories = () => {
       background: none;
       border: none;
       cursor: pointer;
+      transition: transform 0.3s ease;
 
-      img {
+      &:hover {
+        transform: scale(1.1);
+      }
+
+      .favorite-icon {
         width: 30px;
-        margin: 5px 0;
+        transition: filter 0.3s ease;
       }
     }
   }
@@ -177,8 +221,7 @@ const showAllCategories = () => {
       }
     }
 
-
-    a{
+    a {
       text-decoration: none;
     }
 
@@ -189,7 +232,7 @@ const showAllCategories = () => {
       overflow: hidden;
       text-overflow: ellipsis;
       display: -webkit-box;
-      -webkit-line-clamp: 3; /* Limit the number of lines for description */
+      -webkit-line-clamp: 3;
       -webkit-box-orient: vertical;
     }
 
@@ -206,7 +249,7 @@ const showAllCategories = () => {
   }
 
   .modal-categories {
-    position: absolute; /* Позиционируем модальное окно относительно карточки */
+    position: absolute;
     top: 0;
     left: 0;
     right: 0;
@@ -215,7 +258,7 @@ const showAllCategories = () => {
     display: flex;
     align-items: center;
     justify-content: center;
-    z-index: 10; /* Задаем z-index для модального окна */
+    z-index: 10;
 
     .modal-content {
       background: #fff;

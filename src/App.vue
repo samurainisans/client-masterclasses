@@ -13,26 +13,22 @@
 <script setup lang="ts">
 import { onMounted } from 'vue';
 import { useUserStore } from '@/stores/userStore';
+import { useFavoritesStore } from '@/stores/favoritesStore';
 import Nav from '@/components/ui/navigation/Nav.vue';
 
 const userStore = useUserStore();
+const favoritesStore = useFavoritesStore();
 
 onMounted(async () => {
   if (!userStore.user) {
     await userStore.checkUser();
   }
+  await favoritesStore.fetchFavorites();
 });
 </script>
 
 <style scoped>
 .main-content {
   margin-top: 60px;
-}
-
-.fade-enter-active, .fade-leave-active {
-  transition: opacity 0.5s ease;
-}
-.fade-enter, .fade-leave-to /* .fade-leave-active in <2.1.8 */ {
-  opacity: 0;
 }
 </style>

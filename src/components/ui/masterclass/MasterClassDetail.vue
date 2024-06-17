@@ -1,4 +1,3 @@
-<!-- src/components/ui/masterclass/MasterClassDetail.vue -->
 <template>
   <transition name="fade" mode="out-in">
     <div class="masterclass-page" key="masterclass-page">
@@ -20,7 +19,7 @@
                 {{ formattedDateTime }}
               </p>
               <p v-if="masterClass.locality" class="location">{{ masterClass.locality }}</p>
-              <button class="register-button">Записаться</button>
+              <button class="register-button" @click="registerForClass">Записаться</button>
             </div>
             <div v-if="masterClass.image_url" class="masterclass-image">
               <img :src="masterClass.image_url" alt="Master Class Image" />
@@ -60,6 +59,7 @@
             <div id="mapContainer" class="map-container"></div>
           </div>
         </div>
+
         <div class="related-events" v-if="relatedEvents.length">
           <h2>Другие мероприятия в этом городе</h2>
           <div class="events-grid">
@@ -75,20 +75,25 @@
     </div>
   </transition>
 </template>
+
 <script setup lang="ts">
 import { ref, computed, onMounted, nextTick, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { useMasterClassesStore } from '@/stores/masterClasses'
+import { useRegistrationStore } from '@/stores/registrationStore'
 import MasterClassCard from '@/components/ui/masterclass/MasterClassCard.vue'
 import { fetchMasterClassesByCity } from '@/services/masterClassService'
+import { useToast } from '@/composables/useToast'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 
 const route = useRoute()
 const masterClassId = ref(route.params.id)
 const masterClassesStore = useMasterClassesStore()
+const registrationStore = useRegistrationStore()
 const masterClass = computed(() => masterClassesStore.selectedMasterClass)
 const relatedEvents = ref([])
+const { showToast } = useToast()
 
 let map
 let marker
@@ -159,6 +164,15 @@ const formattedDateTime = computed(() => {
   }
 })
 
+const registerForClass = async () => {
+  try {
+    const response = await registrationStore.registerForMasterClass(masterClassId.value)
+    showToast("Успешная регистрация", 'success')
+  } catch (error) {
+    showToast("Вы уже зарегистрированы на это мероприятие", 'error')
+  }
+}
+
 watch(
   () => route.params.id,
   (newId) => {
@@ -170,6 +184,7 @@ onMounted(() => {
   fetchMasterClass(masterClassId.value)
 })
 </script>
+
 
 <style lang="scss" scoped>
 @import '@/assets/variables';
