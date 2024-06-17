@@ -1,4 +1,3 @@
-
 <!-- src\components\ui\filter\CheckboxList.vue-->
 <template>
   <div class="filter-dropdown" @mouseleave="closeDropdown" :class="{ inline: inline }">
@@ -112,6 +111,10 @@ onBeforeUnmount(() => {
 @import '@/assets/variables';
 
 .filter-dropdown {
+  @media screen and (max-width: 768px) {
+    width: 100%;
+  }
+
   position: relative;
   display: inline-block;
   border: 1.4px solid $green;

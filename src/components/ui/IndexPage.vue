@@ -1,4 +1,3 @@
-<!-- src/components/ui/IndexPage.vue -->
 <template>
   <div class="main-container">
     <Nav />
@@ -14,7 +13,7 @@
           />
         </transition-group>
         <div v-if="!loading && masterClassesStore.getMasterClasses.length === 0" class="no-results">
-          Не найдено мастер-классов с таким названием :(
+          не найдено мастер-классов с таким названием :(
         </div>
       </div>
       <div class="pagination" v-if="totalPages > 1">
@@ -78,12 +77,12 @@ watch(() => masterClassesStore.getMasterClasses, () => {
 @import '@/assets/variables.scss';
 
 .main-container {
-  width: 1520px;
+  max-width: 1320px;
   margin: 0 auto;
 }
 
 .content {
-  padding: 10px 20px 20px;
+  padding: 10px 0 20px;
 }
 
 .cards-container {
@@ -95,14 +94,29 @@ watch(() => masterClassesStore.getMasterClasses, () => {
 
 .cards-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 20px;
+  gap: 32px 24px;
+  width: 100%;
+  justify-content: center;
+
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+
+  @media (max-width: 767px) {
+    .list-item {
+      width: 320px;
+      margin: 0 auto;
+    }
+  }
 }
 
 .no-results {
   margin-top: 20px;
   font-size: 18px;
   color: $gray;
+  text-align: center;
+
+  @media (max-width: 768px) {
+    font-size: 16px;
+  }
 }
 
 .pagination {

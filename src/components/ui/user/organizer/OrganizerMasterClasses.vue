@@ -58,7 +58,7 @@ onMounted(loadMasterClasses);
 }
 
 .organizer-master-classes {
-  max-width: 1520px;
+  max-width: 1380px;
   width: 100%;
 
   h2 {

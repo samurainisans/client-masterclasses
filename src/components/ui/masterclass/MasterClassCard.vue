@@ -130,8 +130,8 @@ const toggleFavorite = () => {
   border: 1.5px solid $green;
   border-radius: 8px;
   overflow: hidden;
-  margin: 15px;
-  width: 400px;
+  //margin: 0px 0 0 0;
+  width: auto;
   transition:
     transform 0.3s ease,
     box-shadow 0.3s ease;

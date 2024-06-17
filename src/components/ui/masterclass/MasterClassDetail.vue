@@ -201,7 +201,7 @@ html {
 }
 
 .masterclass-container {
-  max-width: 1520px;
+  max-width: 1380px;
   margin: 0 auto;
   padding: 16px;
 }

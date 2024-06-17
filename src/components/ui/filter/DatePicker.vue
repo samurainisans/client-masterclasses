@@ -49,6 +49,9 @@ const onClearDate = () => {
 @import '@/assets/variables';
 
 .datepicker-container {
+  @media screen and (max-width: 768px) {
+    width: 100%;
+  }
   width: 200px;
   --dp-menu-min-width: 280px;
   --dp-calendar-header-cell-padding: 1rem;

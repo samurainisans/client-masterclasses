@@ -10,9 +10,7 @@
     </div>
     <ul class="profile-modal__list">
       <li><a @click="goToProfile">Профиль</a></li>
-      <AuthGuard :roles="['Organizer', 'Admin']">
-        <li><a @click="goToMyMasterClasses" >Мои мероприятия</a></li>
-      </AuthGuard>
+      <li><a href="#">Мои мероприятия</a></li>
       <AuthGuard :roles="['Organizer', 'Admin']">
         <li><a href="#">Мои заявки</a></li>
       </AuthGuard>
@@ -34,10 +32,6 @@ const router = useRouter()
 
 const goToProfile = () => {
   router.push({ name: 'Profile' })
-}
-
-const goToMyMasterClasses = () => {
-  router.push({ name: 'OrganizerMasterClasses' })
 }
 
 const logout = () => {
@@ -69,7 +63,6 @@ const logout = () => {
     background: white;
     border-left: 1px solid #ddd;
     border-top: 1px solid #ddd;
-    transform: rotate(45deg);
     top: -5px;
     left: 50%;
     transform: translateX(-50%) rotate(45deg);

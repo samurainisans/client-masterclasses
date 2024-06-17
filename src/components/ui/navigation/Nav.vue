@@ -1,22 +1,17 @@
-<!-- src/components/ui/navigation/Nav.vue -->
 <template>
   <nav class="navbar">
     <div class="navbar__container">
       <div class="navbar__logo" @click="goToHome">Главная</div>
-      <div class="navbar__search">
-        <input
-          type="text"
-          placeholder="Найти мероприятие"
-          v-model="searchQuery"
-          @keyup.enter="searchMasterClasses"
-        />
-      </div>
-      <AuthGuard :roles="['Organizer', 'Admin']">
-        <div class="navbar__filters">
-          <a class="navbar__link" @click="goToMap">На карту</a>
-        </div>
-      </AuthGuard>
       <div class="navbar__actions">
+        <AuthGuard :roles="['Organizer', 'Admin']">
+          <img
+            class="navbar__map-icon"
+            src="@/assets/imgs/map.svg"
+            @click="goToMap"
+            alt="Map"
+            title="На карту"
+          />
+        </AuthGuard>
         <img
           v-if="!isAuthenticated"
           class="navbar__icon"
@@ -45,15 +40,12 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue';
 import { useRouter } from 'vue-router';
-import { useMasterClassesStore } from '@/stores/masterClasses';
 import { useUserStore } from '@/stores/userStore';
 import LoginModal from '@/components/ui/auth/LoginModal.vue';
 import AuthGuard from "@/components/ui/permission/AuthGuard.vue";
 import ProfileModal from "@/components/ui/user/ProfileModal.vue";
 
 const router = useRouter();
-const searchQuery = ref('');
-const masterClassesStore = useMasterClassesStore();
 const userStore = useUserStore();
 const isLoginModalVisible = ref(false);
 const isProfileModalVisible = ref(false);
@@ -73,7 +65,6 @@ const toggleProfileModal = () => {
   isProfileModalVisible.value = !isProfileModalVisible.value;
 };
 
-// наблюдение за состоянием аутентификации, чтобы закрыть модальное окно профиля при выходе
 watch(isAuthenticated, (newVal) => {
   if (!newVal) {
     isProfileModalVisible.value = false;
@@ -86,18 +77,6 @@ const goToHome = () => {
 
 const goToMap = () => {
   router.push({ name: 'Map' });
-};
-
-const goToAddMasterClass = () => {
-  router.push({ name: 'AddMasterClass' });
-};
-
-const searchMasterClasses = async () => {
-  try {
-    await masterClassesStore.searchMasterClassesByTitle(searchQuery.value);
-  } catch (error) {
-    console.error('Error searching master classes:', error);
-  }
 };
 </script>
 
@@ -121,16 +100,17 @@ const searchMasterClasses = async () => {
   top: 0;
   left: 0;
   z-index: 1000;
-  height: 60px;
+  height: 55px;
+  display: flex;
 
   &__container {
     width: 100%;
-    max-width: 1520px;
+    gap: 24px;
+    max-width: 1320px;
     margin: 0 auto;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 10px 20px;
   }
 
   &__logo {
@@ -140,17 +120,14 @@ const searchMasterClasses = async () => {
     cursor: pointer;
   }
 
-  &__search {
-    flex: 1;
-    margin: 0 50px;
+  &__map-icon {
+    height: 40px;
+    width: 40px;
+    cursor: pointer;
+    transition: transform 0.3s ease;
 
-    input {
-      width: 100%;
-      padding: 10px;
-      border: 1px solid $green;
-      border-radius: 5px;
-      font-size: 14px;
-      gap: 20px;
+    &:hover {
+      transform: scale(1.1);
     }
   }
 
@@ -162,7 +139,6 @@ const searchMasterClasses = async () => {
       height: 40px;
       cursor: pointer;
       margin-left: 10px;
-      transition: transform 0.3s ease;
 
       &:hover {
         transform: scale(1.1);
@@ -185,16 +161,14 @@ const searchMasterClasses = async () => {
     }
 
     .navbar__profile-wrapper {
-      position: relative;
-      display: inline-block;
+      display: flex;
     }
 
     .navbar__profile-icon {
       height: 40px;
-      margin-left: 10px;
+      margin-left: 24px;
       cursor: pointer;
       transition: transform 0.3s ease;
-
       &:hover {
         transform: scale(1.1);
       }

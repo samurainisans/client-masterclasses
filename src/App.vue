@@ -1,12 +1,12 @@
 <!-- src/App.vue -->
 <template>
   <div id="app">
-    <Nav />
-    <main class="main-content">
-      <transition name="fade" mode="out-in">
+    <div class="wrapper">
+      <main class="main-content">
+        <Nav />
         <router-view />
-      </transition>
-    </main>
+      </main>
+    </div>
   </div>
 </template>
 
@@ -27,7 +27,13 @@ onMounted(async () => {
 });
 </script>
 
-<style scoped>
+<style>
+.wrapper {
+  margin: 0 auto;
+  max-width: 1280px;
+  padding: 0 20px;
+}
+
 .main-content {
   margin-top: 60px;
 }
