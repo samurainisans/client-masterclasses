@@ -6,8 +6,12 @@ const BASE_URL = 'http://127.0.0.1:8000';
 
 axios.interceptors.request.use((config) => {
   const accessToken = Cookies.get('access_token');
+  const csrfToken = Cookies.get('csrftoken');
   if (accessToken) {
     config.headers['Authorization'] = `Bearer ${accessToken}`;
+  }
+  if (csrfToken) {
+    config.headers['X-CSRFToken'] = csrfToken;
   }
   return config;
 });
@@ -40,26 +44,32 @@ export const userService = {
   },
   async login(credentials: any) {
     const response = await axios.post(`${BASE_URL}/login/`, credentials);
-    const { access, refresh } = response.data;
+    const { access, refresh, csrf_token } = response.data;
     Cookies.set('access_token', access, { secure: true });
     Cookies.set('refresh_token', refresh, { secure: true });
+    Cookies.set('csrftoken', csrf_token, { secure: true });
     axios.defaults.headers.common['Authorization'] = `Bearer ${access}`;
+    axios.defaults.headers.common['X-CSRFToken'] = csrf_token;
     return response.data;
   },
   async getUserInfo(userId: number) {
     return axios.get(`${BASE_URL}/api/users/${userId}/`);
   },
   async updateUser(userId: number, userData: FormData) {
-    return axios.put(`${BASE_URL}/users/${userId}/`, userData, {
+    const csrfToken = Cookies.get('csrftoken');
+    return axios.put(`${BASE_URL}/api/users/${userId}/`, userData, {
       headers: {
-        'Content-Type': 'multipart/form-data'
+        'Content-Type': 'multipart/form-data',
+        'X-CSRFToken': csrfToken
       }
     });
   },
   logout() {
     Cookies.remove('access_token');
     Cookies.remove('refresh_token');
+    Cookies.remove('csrftoken');
     delete axios.defaults.headers.common['Authorization'];
+    delete axios.defaults.headers.common['X-CSRFToken'];
   }
 };
 

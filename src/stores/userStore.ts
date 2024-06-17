@@ -29,7 +29,7 @@ export const useUserStore = defineStore('user', () => {
 
         const decodedToken = parseJwt(response.access);
         const userId = decodedToken.user_id;
-        await fetchUserInfo(userId);
+        await fetchUser(userId);
       } else {
         throw new Error('Ошибка авторизации: токены не получены');
       }
@@ -38,7 +38,7 @@ export const useUserStore = defineStore('user', () => {
     }
   };
 
-  const fetchUserInfo = async (userId: number) => {
+  const fetchUser = async (userId: number) => {
     try {
       const response = await userService.getUserInfo(userId);
       user.value = response.data;  // Сохраняем данные пользователя
@@ -50,7 +50,7 @@ export const useUserStore = defineStore('user', () => {
   const checkUser = async () => {
     if (!user.value && accessToken.value) {
       const decodedToken = parseJwt(accessToken.value);
-      await fetchUserInfo(decodedToken.user_id);
+      await fetchUser(decodedToken.user_id);
     }
   };
 
@@ -69,7 +69,7 @@ export const useUserStore = defineStore('user', () => {
     isAuthenticated,
     register,
     login,
-    fetchUserInfo,
+    fetchUser,
     checkUser,
     logout,
   };

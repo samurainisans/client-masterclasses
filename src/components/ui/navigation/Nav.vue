@@ -25,11 +25,6 @@
           alt="Login"
           title="Войти"
         />
-        <AuthGuard :roles="['Organizer', 'Admin']">
-          <button class="navbar__button" @click="goToAddMasterClass" title="Добавить мастер-класс">
-            Добавить мастер-класс
-          </button>
-        </AuthGuard>
         <div class="navbar__profile-wrapper">
           <img
             v-if="isAuthenticated"

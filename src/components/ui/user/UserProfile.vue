@@ -7,58 +7,59 @@
         <input type="file" @change="onImageChange" class="user-profile__file-input" />
       </div>
     </div>
-    <div class="user-profile__info">
-      <h2>{{ user.username }}</h2>
-      <div class="user-info">
-        <div class="user-info__field">
-          <label>Имя:</label>
-          <span v-if="!editMode">{{ user.first_name || 'не указано' }}</span>
-          <input v-else v-model="editableUser.first_name" />
+    <form @submit.prevent="saveChanges">
+      <div class="user-profile__info">
+        <h2>{{ user.username }}</h2>
+        <div class="user-info">
+          <div class="user-info__field">
+            <label>Имя:</label>
+            <span v-if="!editMode">{{ user.first_name || 'не указано' }}</span>
+            <input v-else v-model="editableUser.first_name" />
+          </div>
+          <div class="user-info__field">
+            <label>Фамилия:</label>
+            <span v-if="!editMode">{{ user.last_name || 'не указано' }}</span>
+            <input v-else v-model="editableUser.last_name" />
+          </div>
+          <div class="user-info__field">
+            <label>Электронная почта:</label>
+            <span v-if="!editMode">{{ user.email }}</span>
+            <input v-else v-model="editableUser.email" type="email" />
+          </div>
+          <div class="user-info__field">
+            <label>Роль:</label>
+            <span>{{ translatedRole }}</span>
+          </div>
+          <div class="user-info__field">
+            <label>Дата регистрации:</label>
+            <span>{{ formatDate(user.date_joined) }}</span>
+          </div>
+          <div class="user-info__field">
+            <label>Био:</label>
+            <span v-if="!editMode">{{ user.bio || 'не указано' }}</span>
+            <textarea v-else v-model="editableUser.bio"></textarea>
+          </div>
+          <div class="user-info__field">
+            <label>Возраст:</label>
+            <span v-if="!editMode">{{ user.age !== null ? user.age : 'не указано' }}</span>
+            <input v-else v-model="editableUser.age" type="number" />
+          </div>
+          <div class="user-info__field">
+            <label>Пол:</label>
+            <span v-if="!editMode">{{ user.gender || 'не указано' }}</span>
+            <select v-else v-model="editableUser.gender">
+              <option value="male">Мужской</option>
+              <option value="female">Женский</option>
+            </select>
+          </div>
         </div>
-        <div class="user-info__field">
-          <label>Фамилия:</label>
-          <span v-if="!editMode">{{ user.last_name || 'не указано' }}</span>
-          <input v-else v-model="editableUser.last_name" />
-        </div>
-        <div class="user-info__field">
-          <label>Электронная почта:</label>
-          <span v-if="!editMode">{{ user.email }}</span>
-          <input v-else v-model="editableUser.email" type="email" />
-        </div>
-        <div class="user-info__field">
-          <label>Роль:</label>
-          <span>{{ translatedRole }}</span>
-        </div>
-        <div class="user-info__field">
-          <label>Дата регистрации:</label>
-          <span>{{ formatDate(user.date_joined) }}</span>
-        </div>
-        <div class="user-info__field">
-          <label>Био:</label>
-          <span v-if="!editMode">{{ user.bio || 'не указано' }}</span>
-          <textarea v-else v-model="editableUser.bio"></textarea>
-        </div>
-        <div class="user-info__field">
-          <label>Возраст:</label>
-          <span v-if="!editMode">{{ user.age !== null ? user.age : 'не указано' }}</span>
-          <input v-else v-model="editableUser.age" type="number" />
-        </div>
-        <div class="user-info__field">
-          <label>Пол:</label>
-          <span v-if="!editMode">{{ user.gender || 'не указано' }}</span>
-          <select v-else v-model="editableUser.gender">
-            <option value="male">Мужской</option>
-            <option value="female">Женский</option>
-            <option value="other">Другой</option>
-          </select>
+        <div class="user-profile__actions">
+          <button v-if="!editMode" @click="enableEditMode">Редактировать</button>
+          <button v-else type="submit">Сохранить</button>
+          <button v-if="editMode" @click="cancelEdit">Отмена</button>
         </div>
       </div>
-      <div class="user-profile__actions">
-        <button v-if="!editMode" @click="enableEditMode">Редактировать</button>
-        <button v-else @click="saveChanges">Сохранить</button>
-        <button v-if="editMode" @click="cancelEdit">Отмена</button>
-      </div>
-    </div>
+    </form>
     <a class="logout-link" @click="confirmLogout">Выйти</a>
   </div>
   <div v-else>
@@ -115,12 +116,17 @@ const saveChanges = async () => {
       formData.append('image', newAvatar.value);
     }
 
-    await userService.updateUser(user.value.id, formData);
-    await userStore.fetchUser();
-    showToast('Изменения успешно сохранены', 'success');
-    editMode.value = false;
+    const response = await userService.updateUser(user.value.id, formData);
+    console.log(JSON.stringify(response.data, null, 2));
+    if (response.status === 200) {
+      await userStore.fetchUser(user.value.id);
+      showToast(response.data.message, 'success');
+      editMode.value = false;
+      router.go();
+    }
   } catch (error) {
-    showToast('Ошибка при сохранении изменений', 'error');
+    console.error('Error during saveChanges:', error);
+    showToast(`Ошибка при сохранении изменений: ${error.message}`, 'error');
   }
 };
 
@@ -147,10 +153,9 @@ const logout = () => {
 <style scoped lang="scss">
 @import "@/assets/variables";
 
-
 .user-profile__image {
-  max-width: 250px;
-  max-height: 250px;
+  width: 250px;
+  height: 250px;
   border-radius: 50%;
   object-fit: cover;
   border: solid 3px $green;
