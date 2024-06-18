@@ -1,4 +1,3 @@
-<!--src/components/ui/filter/FiltrationComponent.vue-->
 <template>
   <div class="search_container">
     <div class="search_section">
@@ -64,6 +63,7 @@ const store = useMasterClassesStore()
 
 const selectedCategories = ref<number[]>([])
 const selectedCities = ref<string[]>([])
+const searchQuery = ref<string>('')
 
 const goToAddMasterClass = () => {
   router.push({ name: 'AddMasterClass' })
@@ -78,9 +78,9 @@ const loadItems = async () => {
       label: cat.name
     }))
 
-    cityItems.value = cities.map((city: { locality: string }) => ({
-      value: city.locality,
-      label: city.locality
+    cityItems.value = cities.map((city: any) => ({
+      value: city,
+      label: city
     }))
   } catch (error) {
     console.error('не удалось загрузить данные', error)
@@ -91,7 +91,6 @@ const updateCategories = (selectedCategoriesArray: number[]) => {
   selectedCategories.value = selectedCategoriesArray
   store.setSelectedCategories(selectedCategoriesArray)
   store.fetchMasterClasses()
-  // saveFilters();
 }
 
 const updateCities = (selectedCitiesArray: string[]) => {
@@ -122,6 +121,10 @@ const removeCity = (index: number) => {
   updateCities([...selectedCities.value])
 }
 
+const searchMasterClasses = async () => {
+  await store.searchMasterClassesByTitle(searchQuery.value)
+}
+
 onMounted(() => {
   loadItems()
 })
@@ -130,6 +133,7 @@ watch([selectedCategories, selectedCities, store.startDate, store.endDate] as an
   store.fetchMasterClasses()
 })
 </script>
+
 
 <style scoped lang="scss">
 @import '@/assets/variables';

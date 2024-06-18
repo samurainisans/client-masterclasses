@@ -1,10 +1,43 @@
-// src/services/masterClassService.ts
 import axios from 'axios';
 
 const BASE_URL = 'http://127.0.0.1:8000/api';
 
-// get masterclasses {{BASE_URL}}/masterclasses
-export const fetchMasterClasses = async (categories = [], cities = [], startDate = null, endDate = null, fetchAll = false) => {
+interface MasterClass {
+  [key: string]: any;
+}
+
+interface FetchResponse {
+  results: any[];
+  next?: string;
+}
+
+interface Category {
+  id: number;
+  name: string;
+}
+
+interface City {
+  id: number;
+  name: string;
+}
+
+interface Organizer {
+  id: number;
+  username: string;
+}
+
+interface Speaker {
+  id: number;
+  username: string;
+}
+
+export const fetchMasterClasses = async (
+  categories: number[] = [],
+  cities: string[] = [],
+  startDate: Date | null = null,
+  endDate: Date | null = null,
+  fetchAll: boolean = false
+): Promise<any[]> => {
   try {
     const params = new URLSearchParams();
     categories.forEach(category => params.append('categories', category.toString()));
@@ -16,12 +49,12 @@ export const fetchMasterClasses = async (categories = [], cities = [], startDate
       params.append('end_date', endDate.toISOString());
     }
 
-    const fetchPage = async (url) => {
+    const fetchPage = async (url: string): Promise<FetchResponse> => {
       const response = await axios.get(url, { params });
       return response.data;
     };
 
-    let data = [];
+    let data: any[] = [];
     let url = `${BASE_URL}/masterclasses/`;
     let response = await fetchPage(url);
     data = response.results;
@@ -40,7 +73,7 @@ export const fetchMasterClasses = async (categories = [], cities = [], startDate
   }
 };
 
-export const fetchMasterClassesByCity = async (city: string) => {
+export const fetchMasterClassesByCity = async (city: string): Promise<any[]> => {
   try {
     const response = await axios.get(`${BASE_URL}/masterclasses/by_city/?locality=${city}`);
     return response.data;
@@ -50,9 +83,7 @@ export const fetchMasterClassesByCity = async (city: string) => {
   }
 };
 
-
-// метод для получения конкретного мастер-класса
-export const fetchMasterClassById = async (id: number) => {
+export const fetchMasterClassById = async (id: number): Promise<any> => {
   try {
     const response = await axios.get(`${BASE_URL}/masterclasses/${id}/`);
     return response.data;
@@ -62,8 +93,7 @@ export const fetchMasterClassById = async (id: number) => {
   }
 };
 
-// get organizers {{BASE_URL}}/users/organizers
-export const fetchOrganizers = async () => {
+export const fetchOrganizers = async (): Promise<Organizer[]> => {
   try {
     const response = await axios.get(`${BASE_URL}/users/organizers/`);
     return response.data;
@@ -73,8 +103,7 @@ export const fetchOrganizers = async () => {
   }
 };
 
-// get speakers {{BASE_URL}}/users/speakers
-export const fetchSpeakers = async () => {
+export const fetchSpeakers = async (): Promise<Speaker[]> => {
   try {
     const response = await axios.get(`${BASE_URL}/users/speakers/`);
     return response.data;
@@ -84,8 +113,7 @@ export const fetchSpeakers = async () => {
   }
 };
 
-// get categories {{BASE_URL}}/masterclasses/categories
-export const fetchCategories = async () => {
+export const fetchCategories = async (): Promise<Category[]> => {
   try {
     const response = await axios.get(`${BASE_URL}/masterclasses/categories/`);
     return response.data;
@@ -95,8 +123,7 @@ export const fetchCategories = async () => {
   }
 };
 
-// get cities {{BASE_URL}}/masterclasses/cities
-export const fetchCities = async () => {
+export const fetchCities = async (): Promise<City[]> => {
   try {
     const response = await axios.get(`${BASE_URL}/masterclasses/cities/`);
     return response.data;
@@ -106,8 +133,7 @@ export const fetchCities = async () => {
   }
 };
 
-// search masterclasses by title {{BASE_URL}}/masterclasses/?search=title
-export const searchMasterClassesByTitle = async (title: string) => {
+export const searchMasterClassesByTitle = async (title: string): Promise<any[]> => {
   try {
     const params = new URLSearchParams();
     params.append('search', title);
@@ -119,17 +145,16 @@ export const searchMasterClassesByTitle = async (title: string) => {
   }
 };
 
-// create masterclass {{BASE_URL}}/masterclasses
-export const createMasterClassAPI = async (masterClass) => {
+export const createMasterClassAPI = async (masterClass: MasterClass): Promise<any> => {
   try {
     console.log('Creating master class with data:', JSON.stringify(masterClass, null, 2));
 
     const formData = new FormData();
     Object.keys(masterClass).forEach(key => {
       if (key === 'categories') {
-        masterClass[key].forEach(value => formData.append(key, value));
+        (masterClass[key] as any[]).forEach((value: any) => formData.append(key, value));
       } else if (key === 'image_url' && masterClass[key]) {
-        formData.append('image_url', masterClass[key], masterClass[key].name);
+        formData.append('image_url', masterClass[key], (masterClass[key] as File).name);
       } else {
         formData.append(key, masterClass[key]);
       }
@@ -147,8 +172,7 @@ export const createMasterClassAPI = async (masterClass) => {
   }
 };
 
-// geocode address {{BASE_URL}}/gis/geocode
-export const geocodeAddress = async (locationName: string) => {
+export const geocodeAddress = async (locationName: string): Promise<any> => {
   try {
     const response = await axios.get(`${BASE_URL}/gis/geocode/`, { params: { location_name: locationName } });
     return response.data;
@@ -158,8 +182,7 @@ export const geocodeAddress = async (locationName: string) => {
   }
 };
 
-// reverse geocode coordinates {{BASE_URL}}/gis/reverse-geocode
-export const reverseGeocodeCoordinates = async (longitude: number, latitude: number) => {
+export const reverseGeocodeCoordinates = async (longitude: number, latitude: number): Promise<any> => {
   try {
     const response = await axios.get(`${BASE_URL}/gis/reverse-geocode/`, { params: { longitude, latitude } });
     return response.data;

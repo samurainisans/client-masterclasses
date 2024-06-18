@@ -1,6 +1,7 @@
-<!-- src\components\map\LayerToggleButton.vue -->
+<!-- src/components/map/LayerToggleButton.vue -->
 <script setup lang="ts">
 import { useLayersStore } from '@/stores/layersStore';
+import L from 'leaflet';
 
 const layers = [
   { name: 'Кластеризация', inactiveSrc: '/src/assets/imgs/layers/inactive/clasterisation.png', activeSrc: '/src/assets/imgs/layers/active/clasterisation.png' },
@@ -8,16 +9,10 @@ const layers = [
   { name: 'Хороплет', inactiveSrc: '/src/assets/imgs/layers/inactive/horoplet.png', activeSrc: '/src/assets/imgs/layers/active/horoplet.png' }
 ];
 
-const props = defineProps({
-  displayedMasterClasses: {
-    type: Array,
-    required: true,
-  },
-  myIcon: {
-    type: Object,
-    required: true,
-  },
-});
+const props = defineProps<{
+  displayedMasterClasses: any[],
+  myIcon: L.Icon<L.IconOptions>
+}>();
 
 const layersStore = useLayersStore();
 
@@ -37,11 +32,12 @@ const selectLayer = (index: number) => {
         class="layer"
         @click="selectLayer(index)"
       >
-        <img :src="layersStore.activeLayer === index ? layer.activeSrc : layer.inactiveSrc"
-             :class="{ 'active-layer': layersStore.activeLayer === index }"
-             @mouseenter="e => e.target.src = layer.activeSrc"
-             @mouseleave="e => e.target.src = layersStore.activeLayer === index ? layer.activeSrc : layer.inactiveSrc"
-             alt="">
+        <img
+          :src="layersStore.activeLayer === index ? layer.activeSrc : layer.inactiveSrc"
+          :class="{ 'active-layer': layersStore.activeLayer === index }"
+          @mouseenter="e => (e.target as HTMLImageElement).src = layer.activeSrc"
+          @mouseleave="e => (e.target as HTMLImageElement).src = layersStore.activeLayer === index ? layer.activeSrc : layer.inactiveSrc"
+          alt="">
         <div class="layer-name">{{ layer.name }}</div>
       </div>
     </div>

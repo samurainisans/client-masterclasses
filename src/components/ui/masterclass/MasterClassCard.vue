@@ -1,3 +1,4 @@
+<!--src/components/ui/masterclass/MasterClassCard.vue-->
 <template>
   <div class="card">
     <div class="image-container">
@@ -77,7 +78,7 @@ const formattedDateTime = computed(() => {
 
   const startDate = new Date(props.masterClass.start_date);
   const endDate = new Date(props.masterClass.end_date);
-  const options = { month: 'long', day: 'numeric' };
+  const options = { month: 'long', day: 'numeric' } as const;
   const startTime = startDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   const endTime = endDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   return `${startDate.toLocaleDateString('ru-RU', options)}, с ${startTime} до ${endTime} по местному времени`;

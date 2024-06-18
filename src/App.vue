@@ -19,7 +19,7 @@ const isMapPage = ref(false)
 const route = useRoute()
 
 const checkIfMapPage = () => {
-  isMapPage.value = route.name?.includes('map') || route.path.includes('map')
+  isMapPage.value = typeof route.name === 'string' && route.name.includes('map') || route.path.includes('map')
 }
 
 onMounted(() => {

@@ -1,4 +1,3 @@
-<!-- src/components/ui/user/UserProfile.vue -->
 <template>
   <div v-if="user" class="user-profile">
     <div class="user-profile__header">
@@ -32,7 +31,7 @@
           </div>
           <div class="user-info__field">
             <label>Дата регистрации:</label>
-            <span>{{ formatDate(user.date_joined) }}</span>
+            <span>{{ formatDate(user.date_joined ?? '') }}</span>
           </div>
           <div class="user-info__field">
             <label>Био:</label>
@@ -76,14 +75,28 @@ import { useToast } from '@/composables/useToast';
 import { useRouter } from 'vue-router';
 import { userService } from '@/services/usersService';
 
+interface User {
+  id: number;
+  username: string;
+  role: string;
+  first_name?: string;
+  last_name?: string;
+  email?: string;
+  date_joined?: string;
+  bio?: string;
+  age?: number;
+  gender?: string;
+  image?: string;
+}
+
 const userStore = useUserStore();
-const user = computed(() => userStore.user);
-const translatedRole = computed(() => rolesDictionary[user.value?.role] || user.value?.role);
+const user = computed<User | null>(() => userStore.user);
+const translatedRole = computed(() => rolesDictionary[user.value?.role as string] || user.value?.role);
 const router = useRouter();
 const { showToast } = useToast();
 
 const editMode = ref(false);
-const editableUser = ref({ ...user.value });
+const editableUser = ref<Partial<User>>({ ...user.value });
 const newAvatar = ref<File | null>(null);
 
 const fullImageUrl = computed(() => {
@@ -105,8 +118,8 @@ const cancelEdit = () => {
 const saveChanges = async () => {
   try {
     const formData = new FormData();
-    formData.append('username', editableUser.value.username);
-    formData.append('email', editableUser.value.email);
+    formData.append('username', editableUser.value.username as string);
+    formData.append('email', editableUser.value.email as string);
     formData.append('first_name', editableUser.value.first_name || '');
     formData.append('last_name', editableUser.value.last_name || '');
     formData.append('bio', editableUser.value.bio || '');
@@ -116,17 +129,18 @@ const saveChanges = async () => {
       formData.append('image', newAvatar.value);
     }
 
-    const response = await userService.updateUser(user.value.id, formData);
+    const response = await userService.updateUser(user.value!.id, formData);
     console.log(JSON.stringify(response.data, null, 2));
     if (response.status === 200) {
-      await userStore.fetchUser(user.value.id);
+      await userStore.fetchUser(user.value!.id);
       showToast(response.data.message, 'success');
       editMode.value = false;
-      router.go();
+      router.go(0);
     }
   } catch (error) {
+    const err = error as { message: string };
     console.error('Error during saveChanges:', error);
-    showToast(`Ошибка при сохранении изменений: ${error.message}`, 'error');
+    showToast(`Ошибка при сохранении изменений: ${err.message}`, 'error');
   }
 };
 

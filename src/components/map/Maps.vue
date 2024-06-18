@@ -2,6 +2,7 @@
   <div class="main-container">
     <Nav @openAuthModal="toggleModal" />
     <div id="map" class="maps-container"></div>
+    <LayerToggleButton :displayedMasterClasses="displayedMasterClasses" :myIcon="myIcon" />
     <div class="controls-container">
       <Timeline
         :start-date="earliestDate"
@@ -37,6 +38,7 @@ import Timeline from '@/components/map/Timeline.vue'
 import Nav from '@/components/ui/navigation/Nav.vue'
 import AuthModal from '@/components/ui/auth/LoginModal.vue'
 import LayerToggleButton from '@/components/map/LayerToggleButton.vue'
+import L from "leaflet";
 
 const store = useMasterClassesStore()
 const layersStore = useLayersStore()
@@ -113,7 +115,7 @@ function initializeMap(center: [number, number]) {
 }
 
 onMounted(async () => {
-  await store.fetchAllMasterClasses(true) // Fetch all master classes with one request
+  await store.fetchAllMasterClasses(true)
   if (navigator.geolocation) {
     navigator.geolocation.getCurrentPosition(
       (position) => {
@@ -122,16 +124,15 @@ onMounted(async () => {
       },
       () => {
         alert('Не удалось получить ваше местоположение.')
-        initializeMap([55.755819, 37.617644]) // Default to Moscow if geolocation fails
+        initializeMap([55.755819, 37.617644])
       }
     )
   } else {
     alert('Ваш браузер не поддерживает геолокацию.')
-    initializeMap([55.755819, 37.617644]) // Default to Moscow if geolocation is not supported
+    initializeMap([55.755819, 37.617644])
   }
 })
 
-// Следим за изменениями в данных и обновляем маркеры
 watch(
   () => store.masterClasses,
   (newData) => {

@@ -1,4 +1,5 @@
 // src/stores/masterClasses.ts
+
 import { defineStore } from 'pinia'
 import {
   fetchMasterClasses,
@@ -22,10 +23,12 @@ type User = {
   image: string | null
 }
 
-type Category = {
+
+export type Category = {
   id: number
   name: string
 }
+
 
 type MasterClass = {
   id: number
@@ -54,6 +57,10 @@ type MasterClass = {
   requires_approval: boolean
   price: string
 }
+
+type Organizer = Omit<User, 'id'> & { id: number }
+
+type Speaker = Omit<User, 'id'> & { id: number }
 
 export const useMasterClassesStore = defineStore('masterClasses', {
   state: () => ({
@@ -125,7 +132,7 @@ export const useMasterClassesStore = defineStore('masterClasses', {
         this.loading = false
       }
     },
-    async fetchAllMasterClasses() {
+    async fetchAllMasterClasses(b: boolean) {
       this.loading = true
       try {
         const data = await fetchMasterClasses(
@@ -150,14 +157,32 @@ export const useMasterClassesStore = defineStore('masterClasses', {
     },
     async fetchOrganizers() {
       try {
-        this.organizers = await fetchOrganizers()
+        const organizers = await fetchOrganizers()
+        this.organizers = organizers.map((organizer: any) => ({
+          id: organizer.id,
+          username: organizer.username,
+          first_name: organizer.first_name,
+          last_name: organizer.last_name,
+          email: organizer.email,
+          bio: organizer.bio,
+          image: organizer.image
+        }))
       } catch (error) {
         this.error = 'Failed to fetch organizers'
       }
     },
     async fetchSpeakers() {
       try {
-        this.speakers = await fetchSpeakers()
+        const speakers = await fetchSpeakers()
+        this.speakers = speakers.map((speaker: any) => ({
+          id: speaker.id,
+          username: speaker.username,
+          first_name: speaker.first_name,
+          last_name: speaker.last_name,
+          email: speaker.email,
+          bio: speaker.bio,
+          image: speaker.image
+        }))
       } catch (error) {
         this.error = 'Failed to fetch speakers'
       }

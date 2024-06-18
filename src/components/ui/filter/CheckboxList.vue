@@ -45,24 +45,20 @@
 <script setup lang="ts">
 import { ref, computed, watch, onMounted, onBeforeUnmount } from 'vue'
 
-const props = defineProps({
-  items: {
-    type: Array,
-    required: true
-  },
-  buttonText: {
-    type: String,
-    default: 'Выбрать'
-  },
-  inline: {
-    type: Boolean,
-    default: false
-  }
-})
+interface Item {
+  value: number | string;
+  label: string;
+}
+
+const props = defineProps<{
+  items: Item[];
+  buttonText?: string;
+  inline?: boolean;
+}>()
 
 const selectedItems = ref<(number | string)[]>([])
-const searchQuery = ref('')
-const isDropdownOpen = ref(false)
+const searchQuery = ref<string>('')
+const isDropdownOpen = ref<boolean>(false) // Define the isDropdownOpen variable
 
 const emit = defineEmits(['update:selectedItems'])
 

@@ -92,24 +92,49 @@ import { useRegistrationStore } from '@/stores/registrationStore'
 import MasterClassCard from '@/components/ui/masterclass/MasterClassCard.vue'
 import { fetchMasterClassesByCity } from '@/services/masterClassService'
 import { useToast } from '@/composables/useToast'
+import L from 'leaflet'
+
+interface Coordinates {
+  latitude: number
+  longitude: number
+}
+
+interface MasterClass {
+  id: number
+  title: string
+  categories: Array<{ id: number, name: string }>
+  start_date: string
+  end_date: string
+  locality: string
+  image_url: string | null
+  description: string
+  organizer: { first_name: string, last_name: string }
+  speakers: Array<{ id: number, first_name: string, last_name: string }>
+  street?: string
+  house?: string
+  province?: string
+  country?: string
+  postal_code?: string
+  coordinates?: Coordinates
+}
 
 const route = useRoute()
-const masterClassId = ref(route.params.id)
+const masterClassId = ref<string | string[]>(route.params.id)
 const masterClassesStore = useMasterClassesStore()
 const registrationStore = useRegistrationStore()
-const masterClass = computed(() => masterClassesStore.selectedMasterClass)
-const relatedEvents = ref([])
+const masterClass = computed<MasterClass | null>(() => masterClassesStore.selectedMasterClass)
+const relatedEvents = ref<MasterClass[]>([])
 const { showToast } = useToast()
 
-let map
-let marker
+let map: L.Map | undefined
+let marker: L.Marker | undefined
 
-const fetchMasterClass = async (id) => {
+const fetchMasterClass = async (id: string | string[]) => {
   try {
-    await masterClassesStore.fetchMasterClassById(id)
+    await masterClassesStore.fetchMasterClassById(Number(id))
     if (masterClass.value && masterClass.value.coordinates) {
       await nextTick(() => {
-        initializeMap(masterClass.value.coordinates)
+        initializeMap(masterClass.value!.coordinates!)
       })
       await loadRelatedEvents(masterClass.value.locality)
     }
@@ -118,7 +143,7 @@ const fetchMasterClass = async (id) => {
   }
 }
 
-const initializeMap = (coordinates) => {
+const initializeMap = (coordinates: Coordinates) => {
   if (!coordinates) return
   if (map) {
     map.remove()
@@ -134,15 +159,15 @@ const initializeMap = (coordinates) => {
   marker = L.marker([coordinates.latitude, coordinates.longitude]).addTo(map)
 
   map.on('focus', () => {
-    map.scrollWheelZoom.enable()
+    map!.scrollWheelZoom.enable()
   })
 
   map.on('blur', () => {
-    map.scrollWheelZoom.disable()
+    map!.scrollWheelZoom.disable()
   })
 }
 
-const loadRelatedEvents = async (locality) => {
+const loadRelatedEvents = async (locality: string) => {
   if (!locality) return
   try {
     relatedEvents.value = await fetchMasterClassesByCity(locality)
@@ -172,7 +197,7 @@ const formattedDateTime = computed(() => {
 
 const registerForClass = async () => {
   try {
-    const response = await registrationStore.registerForMasterClass(masterClassId.value)
+    const response = await registrationStore.registerForMasterClass(Number(masterClassId.value))
     showToast('Успешная регистрация', 'success')
   } catch (error) {
     showToast('Вы уже зарегистрированы на это мероприятие', 'error')
@@ -190,6 +215,7 @@ onMounted(() => {
   fetchMasterClass(masterClassId.value)
 })
 </script>
+
 
 <style lang="scss" scoped>
 @import '@/assets/variables';

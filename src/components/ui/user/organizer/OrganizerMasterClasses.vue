@@ -20,10 +20,16 @@ import { parseJwt } from '@/services/usersService';
 import MasterClassCard from "@/components/ui/masterclass/MasterClassCard.vue";
 import Cookies from "js-cookie";
 
-const masterClasses = ref([]);
+interface MasterClass {
+  id: number;
+  title: string;
+  // Add other properties as needed
+}
+
+const masterClasses = ref<MasterClass[]>([]);
 const accessToken = Cookies.get('access_token');
 
-let organizerId;
+let organizerId: number | undefined;
 
 if (accessToken) {
   const decodedToken = parseJwt(accessToken);

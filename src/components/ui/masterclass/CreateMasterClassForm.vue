@@ -144,19 +144,37 @@
 import { ref, onMounted, nextTick, computed } from 'vue'
 import { useMasterClassesStore } from '@/stores/masterClasses'
 import CheckboxList from '@/components/ui/filter/CheckboxList.vue'
+import L from 'leaflet'
+
+interface Category {
+  value: number
+  label: string
+}
+
+interface Organizer {
+  id: number
+  first_name: string
+  last_name: string
+}
+
+interface Speaker {
+  id: number
+  first_name: string
+  last_name: string
+}
 
 const masterClassesStore = useMasterClassesStore()
 const form = ref({
   title: '',
-  categories: [],
+  categories: [] as number[],
   description: '',
   location_name: '',
   start_date: '',
   end_date: '',
   end_register_date: '',
-  image_url: null,
-  organizer: null,
-  speaker: null,
+  image_url: null as File | null,
+  organizer: null as number | null,
+  speaker: null as number | null,
   longitude: '',
   latitude: '',
   country: '',
@@ -171,14 +189,14 @@ const form = ref({
   requires_approval: false
 })
 
-const categories = ref([])
-const organizers = ref([])
-const speakers = ref([])
+const categories = ref<Category[]>([])
+const organizers = ref<Organizer[]>([])
+const speakers = ref<Speaker[]>([])
 
 const fetchCategories = async () => {
   try {
     const data = await masterClassesStore.fetchCategories()
-    categories.value = data.map((category) => ({ value: category.id, label: category.name }))
+    categories.value = (data || []).map((category: any) => ({ value: category.id, label: category.name }))
   } catch (error) {
     console.error('Error fetching categories:', error)
   }
@@ -202,7 +220,7 @@ const fetchSpeakers = async () => {
   }
 }
 
-const updateCategories = (selectedItems) => {
+const updateCategories = (selectedItems: number[]) => {
   form.value.categories = selectedItems
 }
 
@@ -210,12 +228,12 @@ const selectedCategoryLabels = computed(() => {
   return categories.value.filter((category) => form.value.categories.includes(category.value))
 })
 
-const removeCategory = (categoryId) => {
+const removeCategory = (categoryId: number) => {
   form.value.categories = form.value.categories.filter((id) => id !== categoryId)
 }
 
-let map
-let marker
+let map: L.Map | undefined
+let marker: L.Marker | undefined
 
 onMounted(async () => {
   await fetchCategories()
@@ -231,21 +249,21 @@ onMounted(async () => {
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     }).addTo(map)
 
-    map.on('click', async (e) => {
+    map!.on('click', async (e: L.LeafletMouseEvent) => {
       const { lat, lng } = e.latlng
-      form.value.latitude = lat
-      form.value.longitude = lng
+      form.value.latitude = String(lat)
+      form.value.longitude = String(lng)
 
       if (marker) {
         marker.setLatLng([lat, lng])
       } else {
-        marker = L.marker([lat, lng]).addTo(map).bindPopup('Вы выбрали это место').openPopup()
+        marker = L.marker([lat, lng]).addTo(map!).bindPopup('Вы выбрали это место').openPopup()
       }
 
       try {
         await masterClassesStore.reverseGeocodeCoordinates(lng, lat)
-        form.value.latitude = masterClassesStore.addressData.latitude
-        form.value.longitude = masterClassesStore.addressData.longitude
+        form.value.latitude = String(masterClassesStore.addressData.latitude)
+        form.value.longitude = String(masterClassesStore.addressData.longitude)
         form.value.country = masterClassesStore.addressData.country
         form.value.province = masterClassesStore.addressData.province
         form.value.area = masterClassesStore.addressData.area
@@ -261,7 +279,7 @@ onMounted(async () => {
 })
 
 const handleFileUpload = (event: Event) => {
-  const file = (event.target as HTMLInputElement).files[0]
+  const file = (event.target as HTMLInputElement).files?.[0]
   if (file) {
     form.value.image_url = file
   }
@@ -270,8 +288,8 @@ const handleFileUpload = (event: Event) => {
 const checkAddress = async () => {
   try {
     await masterClassesStore.geocodeAddress(form.value.location_name)
-    form.value.latitude = masterClassesStore.addressData.latitude
-    form.value.longitude = masterClassesStore.addressData.longitude
+    form.value.latitude = String(masterClassesStore.addressData.latitude)
+    form.value.longitude = String(masterClassesStore.addressData.longitude)
     form.value.country = masterClassesStore.addressData.country
     form.value.province = masterClassesStore.addressData.province
     form.value.area = masterClassesStore.addressData.area
@@ -281,11 +299,11 @@ const checkAddress = async () => {
     form.value.postal_code = masterClassesStore.addressData.postal_code
 
     const { latitude, longitude } = masterClassesStore.addressData
-    map.setView([latitude, longitude], 13)
+    map!.setView([latitude, longitude], 13)
     if (marker) {
       marker.setLatLng([latitude, longitude])
     } else {
-      marker = L.marker([latitude, longitude]).addTo(map).bindPopup('Ваш адрес').openPopup()
+      marker = L.marker([latitude, longitude]).addTo(map!).bindPopup('Ваш адрес').openPopup()
     }
   } catch (error) {
     console.error('Error checking address:', error)

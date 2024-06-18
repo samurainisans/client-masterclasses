@@ -1,21 +1,21 @@
-<!-- src/components/ui/auth/AuthGuard.vue -->
+<!-- src/components/ui/permission/AuthGuard.vue -->
 <template>
   <slot v-if="hasAccess"></slot>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
-import { useUserStore } from '@/stores/userStore';
+import { computed } from 'vue'
+import { useUserStore } from '@/stores/userStore'
 
-const props = defineProps<{ roles: string[] }>();
+const props = defineProps<{ roles: string[] }>()
 
-const userStore = useUserStore();
-const user = computed(() => userStore.user);
+const userStore = useUserStore()
+const user = computed(() => userStore.user)
 
 const hasAccess = computed(() => {
   if (!user.value) {
-    return false;
+    return false
   }
-  return props.roles.includes(user.value.role);
-});
+  return props.roles.includes(user.value.role)
+})
 </script>

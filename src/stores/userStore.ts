@@ -4,10 +4,17 @@ import { userService, parseJwt } from '@/services/usersService';
 import { ref } from 'vue';
 import Cookies from 'js-cookie';
 
+interface User {
+  id: number;
+  username: string;
+  role: string;
+  // add other properties as needed
+}
+
 export const useUserStore = defineStore('user', () => {
-  const user = ref(null);
-  const accessToken = ref(Cookies.get('access_token') || null);
-  const isAuthenticated = ref(!!accessToken.value);
+  const user = ref<User | null>(null);
+  const accessToken = ref<string | null>(Cookies.get('access_token') || null);
+  const isAuthenticated = ref<boolean>(!!accessToken.value);
 
   const register = async (userData: any) => {
     try {

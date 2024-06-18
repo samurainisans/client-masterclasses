@@ -4,16 +4,39 @@ import { useRoute } from 'vue-router';
 import axios from 'axios';
 import { useToast } from '@/composables/useToast';
 
+interface User {
+  id: number;
+  username: string;
+  first_name: string;
+  last_name: string;
+  email: string;
+}
+
+interface Registration {
+  user: User;
+  register_state: string;
+  date_register: string;
+}
+
+interface ErrorResponse {
+  response?: {
+    data?: {
+      detail?: string;
+    };
+  };
+}
+
 const route = useRoute();
-const masterClassId = ref(route.params.id);
-const registrations = ref([]);
+const masterClassId = ref<string | string[]>(route.params.id);
+const registrations = ref<Registration[]>([]);
 const { showToast } = useToast();
 
 const fetchRegistrations = async () => {
   try {
     const response = await axios.get(`/api/masterclasses/${masterClassId.value}/registrations/`);
     registrations.value = response.data;
-  } catch (error) {
+  } catch (err) {
+    const error = err as ErrorResponse;
     const errorMessage = error.response?.data?.detail || 'Ошибка загрузки заявок';
     showToast(errorMessage, 'error');
     console.error('Ошибка загрузки заявок:', error.response?.data || error);

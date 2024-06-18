@@ -14,6 +14,7 @@
   },
   "dependencies": {
     "-": "^0.0.1",
+    "@types/leaflet.markercluster": "^1.5.4",
     "@vueform/multiselect": "^2.6.7",
     "@vueform/vueform": "^1.9.9",
     "@vuepic/vue-datepicker": "^8.7.0",
