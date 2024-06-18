@@ -191,13 +191,12 @@ watch([selectedCategories, selectedCities, store.startDate, store.endDate] as an
 
 .datepicker-section {
   display: flex;
-  justify-content: center;
 }
 
 @media (max-width: 768px) {
   .filter_container {
     flex-direction: column;
-    padding: 0 10px;
+    //padding: 0 10px;
   }
 
   .filter_section {
@@ -212,7 +211,7 @@ watch([selectedCategories, selectedCities, store.startDate, store.endDate] as an
   margin: 0px 0px 20px 0px;
 
   @media (max-width: 768px) {
-    margin: 0px 10px 20px 10px;
+    margin: 0px 0px 20px 0px;
 
   }
 }

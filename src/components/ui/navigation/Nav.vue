@@ -29,7 +29,10 @@
             alt="Profile"
             title="Профиль"
           />
-          <ProfileModal v-if="isProfileModalVisible && isAuthenticated" @close="toggleProfileModal" />
+          <ProfileModal
+            v-if="isProfileModalVisible && isAuthenticated"
+            @close="toggleProfileModal"
+          />
         </div>
       </div>
     </div>
@@ -38,46 +41,46 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue';
-import { useRouter } from 'vue-router';
-import { useUserStore } from '@/stores/userStore';
-import LoginModal from '@/components/ui/auth/LoginModal.vue';
-import AuthGuard from "@/components/ui/permission/AuthGuard.vue";
-import ProfileModal from "@/components/ui/user/ProfileModal.vue";
+import { ref, computed, watch } from 'vue'
+import { useRouter } from 'vue-router'
+import { useUserStore } from '@/stores/userStore'
+import LoginModal from '@/components/ui/auth/LoginModal.vue'
+import AuthGuard from '@/components/ui/permission/AuthGuard.vue'
+import ProfileModal from '@/components/ui/user/ProfileModal.vue'
 
-const router = useRouter();
-const userStore = useUserStore();
-const isLoginModalVisible = ref(false);
-const isProfileModalVisible = ref(false);
+const router = useRouter()
+const userStore = useUserStore()
+const isLoginModalVisible = ref(false)
+const isProfileModalVisible = ref(false)
 
-const user = computed(() => userStore.user);
-const isAuthenticated = computed(() => userStore.isAuthenticated);
+const user = computed(() => userStore.user)
+const isAuthenticated = computed(() => userStore.isAuthenticated)
 
 const openAuthModal = () => {
-  isLoginModalVisible.value = true;
-};
+  isLoginModalVisible.value = true
+}
 
 const closeLoginModal = () => {
-  isLoginModalVisible.value = false;
-};
+  isLoginModalVisible.value = false
+}
 
 const toggleProfileModal = () => {
-  isProfileModalVisible.value = !isProfileModalVisible.value;
-};
+  isProfileModalVisible.value = !isProfileModalVisible.value
+}
 
 watch(isAuthenticated, (newVal) => {
   if (!newVal) {
-    isProfileModalVisible.value = false;
+    isProfileModalVisible.value = false
   }
-});
+})
 
 const goToHome = () => {
-  router.push({ name: 'Home' });
-};
+  router.push({ name: 'Home' })
+}
 
 const goToMap = () => {
-  router.push({ name: 'Map' });
-};
+  router.push({ name: 'Map' })
+}
 </script>
 
 <style scoped lang="scss">
@@ -102,15 +105,16 @@ const goToMap = () => {
   z-index: 1000;
   height: 55px;
   display: flex;
+  justify-content: center;
 
   &__container {
     width: 100%;
     gap: 24px;
-    max-width: 1320px;
-    margin: 0 auto;
+    max-width: 1280px;
     display: flex;
     align-items: center;
     justify-content: space-between;
+    margin: 0 20px;
   }
 
   &__logo {
@@ -162,6 +166,7 @@ const goToMap = () => {
 
     .navbar__profile-wrapper {
       display: flex;
+      position: relative;
     }
 
     .navbar__profile-icon {
@@ -169,6 +174,7 @@ const goToMap = () => {
       margin-left: 24px;
       cursor: pointer;
       transition: transform 0.3s ease;
+
       &:hover {
         transform: scale(1.1);
       }

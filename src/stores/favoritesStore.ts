@@ -1,6 +1,6 @@
-// src/stores/favoritesStore.ts
 import { defineStore } from 'pinia';
 import { favoritesService } from '@/services/favoritesService';
+import Cookies from 'js-cookie';
 
 export const useFavoritesStore = defineStore('favorites', {
   state: () => ({
@@ -27,6 +27,11 @@ export const useFavoritesStore = defineStore('favorites', {
     },
 
     async fetchFavorites() {
+      const accessToken = Cookies.get('access_token');
+      if (!accessToken) {
+        console.warn('User is not authenticated');
+        return;
+      }
       try {
         const data = await favoritesService.getMyFavorites();
         this.favorites = data.map((favorite: { master_class: { id: number } }) => favorite.master_class.id);

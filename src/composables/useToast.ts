@@ -5,7 +5,7 @@ import Toast from "@/components/ui/Toast.vue";
 
 const toasts = ref<any[]>([]);
 
-const showToast = (message: string, type: 'success' | 'error' = 'success', duration: number = 2000) => {
+const showToast = (message: string, type: 'success' | 'error' | 'warning' = 'success', duration: number = 2000) => {
   const id = Date.now();
   const app = createApp(Toast, { message, type, duration });
   const container = document.createElement('div');

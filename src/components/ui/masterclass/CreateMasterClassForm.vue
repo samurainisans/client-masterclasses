@@ -87,7 +87,7 @@
       </div>
 
       <!-- Требуется подтверждение -->
-      <div class="form-group">
+      <div class="form-group chekbx">
         <label>
           <input type="checkbox" v-model="form.requires_approval" /> Требуется подтверждение
         </label>
@@ -141,12 +141,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, nextTick, computed } from 'vue';
-import { useMasterClassesStore } from '@/stores/masterClasses';
-import L from 'leaflet';
-import CheckboxList from '@/components/ui/filter/CheckboxList.vue';
+import { ref, onMounted, nextTick, computed } from 'vue'
+import { useMasterClassesStore } from '@/stores/masterClasses'
+import CheckboxList from '@/components/ui/filter/CheckboxList.vue'
 
-const masterClassesStore = useMasterClassesStore();
+const masterClassesStore = useMasterClassesStore()
 const form = ref({
   title: '',
   categories: [],
@@ -170,142 +169,147 @@ const form = ref({
   duration: 0,
   price: 0,
   requires_approval: false
-});
+})
 
-const categories = ref([]);
-const organizers = ref([]);
-const speakers = ref([]);
+const categories = ref([])
+const organizers = ref([])
+const speakers = ref([])
 
 const fetchCategories = async () => {
   try {
-    const data = await masterClassesStore.fetchCategories();
-    categories.value = data.map((category) => ({ value: category.id, label: category.name }));
+    const data = await masterClassesStore.fetchCategories()
+    categories.value = data.map((category) => ({ value: category.id, label: category.name }))
   } catch (error) {
-    console.error('Error fetching categories:', error);
+    console.error('Error fetching categories:', error)
   }
-};
+}
 
 const fetchOrganizers = async () => {
   try {
-    await masterClassesStore.fetchOrganizers();
-    organizers.value = masterClassesStore.getOrganizers;
+    await masterClassesStore.fetchOrganizers()
+    organizers.value = masterClassesStore.getOrganizers
   } catch (error) {
-    console.error('Error fetching organizers:', error);
+    console.error('Error fetching organizers:', error)
   }
-};
+}
 
 const fetchSpeakers = async () => {
   try {
-    await masterClassesStore.fetchSpeakers();
-    speakers.value = masterClassesStore.getSpeakers;
+    await masterClassesStore.fetchSpeakers()
+    speakers.value = masterClassesStore.getSpeakers
   } catch (error) {
-    console.error('Error fetching speakers:', error);
+    console.error('Error fetching speakers:', error)
   }
-};
+}
 
 const updateCategories = (selectedItems) => {
-  form.value.categories = selectedItems;
-};
+  form.value.categories = selectedItems
+}
 
 const selectedCategoryLabels = computed(() => {
-  return categories.value.filter((category) => form.value.categories.includes(category.value));
-});
+  return categories.value.filter((category) => form.value.categories.includes(category.value))
+})
 
 const removeCategory = (categoryId) => {
-  form.value.categories = form.value.categories.filter((id) => id !== categoryId);
-};
+  form.value.categories = form.value.categories.filter((id) => id !== categoryId)
+}
 
-let map;
-let marker;
+let map
+let marker
 
 onMounted(async () => {
-  await fetchCategories();
-  await fetchOrganizers();
-  await fetchSpeakers();
+  await fetchCategories()
+  await fetchOrganizers()
+  await fetchSpeakers()
 
   await nextTick(() => {
     map = L.map('mapContainer', {
-      center: [55.7558, 37.6173], // центр карты (Москва)
+      center: [55.7558, 37.6173],
       zoom: 10
-    });
+    })
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '© OpenStreetMap contributors'
-    }).addTo(map);
+    }).addTo(map)
 
     map.on('click', async (e) => {
-      const { lat, lng } = e.latlng;
-      form.value.latitude = lat;
-      form.value.longitude = lng;
+      const { lat, lng } = e.latlng
+      form.value.latitude = lat
+      form.value.longitude = lng
 
       if (marker) {
-        marker.setLatLng([lat, lng]);
+        marker.setLatLng([lat, lng])
       } else {
-        marker = L.marker([lat, lng]).addTo(map).bindPopup('Вы выбрали это место').openPopup();
+        marker = L.marker([lat, lng]).addTo(map).bindPopup('Вы выбрали это место').openPopup()
       }
 
       try {
-        await masterClassesStore.reverseGeocodeCoordinates(lng, lat);
-        form.value.latitude = masterClassesStore.addressData.latitude;
-        form.value.longitude = masterClassesStore.addressData.longitude;
-        form.value.country = masterClassesStore.addressData.country;
-        form.value.province = masterClassesStore.addressData.province;
-        form.value.area = masterClassesStore.addressData.area;
-        form.value.locality = masterClassesStore.addressData.locality;
-        form.value.street = masterClassesStore.addressData.street;
-        form.value.house = masterClassesStore.addressData.house;
-        form.value.postal_code = masterClassesStore.addressData.postal_code;
+        await masterClassesStore.reverseGeocodeCoordinates(lng, lat)
+        form.value.latitude = masterClassesStore.addressData.latitude
+        form.value.longitude = masterClassesStore.addressData.longitude
+        form.value.country = masterClassesStore.addressData.country
+        form.value.province = masterClassesStore.addressData.province
+        form.value.area = masterClassesStore.addressData.area
+        form.value.locality = masterClassesStore.addressData.locality
+        form.value.street = masterClassesStore.addressData.street
+        form.value.house = masterClassesStore.addressData.house
+        form.value.postal_code = masterClassesStore.addressData.postal_code
       } catch (error) {
-        console.error('Error reverse geocoding coordinates:', error);
+        console.error('Error reverse geocoding coordinates:', error)
       }
-    });
-  });
-});
+    })
+  })
+})
 
 const handleFileUpload = (event: Event) => {
-  const file = (event.target as HTMLInputElement).files[0];
+  const file = (event.target as HTMLInputElement).files[0]
   if (file) {
-    form.value.image_url = file;
+    form.value.image_url = file
   }
-};
+}
 
 const checkAddress = async () => {
   try {
-    await masterClassesStore.geocodeAddress(form.value.location_name);
-    form.value.latitude = masterClassesStore.addressData.latitude;
-    form.value.longitude = masterClassesStore.addressData.longitude;
-    form.value.country = masterClassesStore.addressData.country;
-    form.value.province = masterClassesStore.addressData.province;
-    form.value.area = masterClassesStore.addressData.area;
-    form.value.locality = masterClassesStore.addressData.locality;
-    form.value.street = masterClassesStore.addressData.street;
-    form.value.house = masterClassesStore.addressData.house;
-    form.value.postal_code = masterClassesStore.addressData.postal_code;
+    await masterClassesStore.geocodeAddress(form.value.location_name)
+    form.value.latitude = masterClassesStore.addressData.latitude
+    form.value.longitude = masterClassesStore.addressData.longitude
+    form.value.country = masterClassesStore.addressData.country
+    form.value.province = masterClassesStore.addressData.province
+    form.value.area = masterClassesStore.addressData.area
+    form.value.locality = masterClassesStore.addressData.locality
+    form.value.street = masterClassesStore.addressData.street
+    form.value.house = masterClassesStore.addressData.house
+    form.value.postal_code = masterClassesStore.addressData.postal_code
 
-    const { latitude, longitude } = masterClassesStore.addressData;
-    map.setView([latitude, longitude], 13);
+    const { latitude, longitude } = masterClassesStore.addressData
+    map.setView([latitude, longitude], 13)
     if (marker) {
-      marker.setLatLng([latitude, longitude]);
+      marker.setLatLng([latitude, longitude])
     } else {
-      marker = L.marker([latitude, longitude]).addTo(map).bindPopup('Ваш адрес').openPopup();
+      marker = L.marker([latitude, longitude]).addTo(map).bindPopup('Ваш адрес').openPopup()
     }
   } catch (error) {
-    console.error('Error checking address:', error);
+    console.error('Error checking address:', error)
   }
-};
+}
 
 const submitForm = async () => {
   try {
-    await masterClassesStore.createMasterClass(form.value);
-    alert('Мероприятие успешно создано');
+    await masterClassesStore.createMasterClass(form.value)
+    alert('Мероприятие успешно создано')
   } catch (error) {
-    console.error('Error creating master class:', error);
+    console.error('Error creating master class:', error)
   }
-};
+}
 </script>
 
 <style lang="scss" scoped>
 @import '@/assets/variables';
+
+.chekbx {
+  input {
+    height: 20px;
+  }
+}
 
 .form-container {
   max-width: 800px;
@@ -315,8 +319,8 @@ const submitForm = async () => {
   border-radius: 10px;
   background-color: #fff;
 
-  &.checkbox-container {
-    width: 760px;
+  @media (max-width: 768px) {
+    padding: 15px;
   }
 }
 
@@ -326,12 +330,23 @@ const submitForm = async () => {
   border: 1px solid #ddd;
   border-radius: 5px;
   background-color: #f9f9f9;
-  overflow: hidden;
+
+  @media (max-width: 768px) {
+    padding: 8px;
+    margin-bottom: 15px;
+  }
 }
 
 .categories-group {
   display: flex;
   flex-direction: column;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    label {
+      font-size: smaller;
+    }
+  }
 }
 
 .selected-categories {
@@ -360,26 +375,41 @@ const submitForm = async () => {
 }
 
 label {
-  display: block;
+  display: flex;
   margin-bottom: 5px;
+  align-items: center;
+
+  input {
+    margin-right: 10px;
+  }
 }
 
 input,
 select,
 textarea {
-  width: calc(100% - 22px);
+  width: 100%;
   padding: 10px;
   margin-top: 5px;
   box-sizing: border-box;
+
+  @media (max-width: 768px) {
+    padding: 8px;
+  }
 }
 
 .address-group {
   display: flex;
   align-items: center;
-
+  gap: 10px;
   input {
     width: calc(100% - 160px);
     margin-right: 10px;
+
+    @media (max-width: 768px) {
+      width: calc(100% - 120px);
+      margin-right: 5px;
+      flex-direction: column;
+    }
   }
 
   button {
@@ -394,12 +424,21 @@ textarea {
     &:hover {
       background-color: darken($green, 10%);
     }
+
+    @media (max-width: 768px) {
+      width: 120px;
+      padding: 8px;
+    }
   }
 }
 
 .map-container {
   width: 100%;
   height: 400px;
+
+  @media (max-width: 768px) {
+    height: 300px;
+  }
 }
 
 button[type='submit'] {
@@ -409,9 +448,13 @@ button[type='submit'] {
   border: none;
   border-radius: 5px;
   cursor: pointer;
+
+  @media (max-width: 768px) {
+    padding: 8px 15px;
+  }
 }
 
 button[type='submit']:hover {
-  background-color: $green;
+  background-color: darken($green, 10%);
 }
 </style>

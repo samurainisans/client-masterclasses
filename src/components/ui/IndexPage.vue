@@ -98,11 +98,11 @@ watch(() => masterClassesStore.getMasterClasses, () => {
   width: 100%;
   justify-content: center;
 
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(300px, 0fr));
 
   @media (max-width: 767px) {
     .list-item {
-      width: 320px;
+      width: 300px;
       margin: 0 auto;
     }
   }

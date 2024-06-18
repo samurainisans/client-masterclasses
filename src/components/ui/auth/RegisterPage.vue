@@ -73,8 +73,8 @@ const handleRegister = async () => {
     showToast('Успешная регистрация! Пожалуйста, подтвердите свой аккаунт на почте.', 'success');
     resetForm();
     setTimeout(() => {
-      router.push('/login');
-    }, 2000); // Задержка в 2 секунды перед переадресацией
+      router.push('/home');
+    }, 1000);
   } catch (error: any) {
     if (error.response) {
       console.error('Ошибка регистрации:', error.response.data);

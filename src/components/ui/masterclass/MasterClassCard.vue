@@ -112,6 +112,12 @@ const fullImageUrl = computed(() => {
 });
 
 const toggleFavorite = () => {
+  const accessToken = Cookies.get('access_token');
+  if (!accessToken) {
+    showToast('Вы не авторизованы', 'warning');
+    return;
+  }
+
   if (isFavorite.value) {
     favoritesStore.removeFavorite(props.masterClass.id);
     showToast('Удалено из избранного', 'error');
@@ -120,6 +126,7 @@ const toggleFavorite = () => {
     showToast('Добавлено в избранное', 'success');
   }
 };
+
 </script>
 
 <style scoped lang="scss">

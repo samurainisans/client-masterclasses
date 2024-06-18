@@ -1,4 +1,3 @@
-<!-- Timeline.vue -->
 <script setup lang="ts">
 import { ref, watch } from 'vue';
 import SelectComponent from '@/components/ui/SelectComponent.vue';
@@ -83,17 +82,20 @@ function updateSliderBackground(value: number) {
 
 .timeline {
   display: flex;
+  flex-direction: column;
   gap: 20px;
+  padding: 20px;
+  padding-top: 0;
 
   &__controls {
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 20px;
+    gap: 10px;
   }
 
   &__slider {
-    width: 100%;
+    width: 280px;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -102,7 +104,7 @@ function updateSliderBackground(value: number) {
   &__input-range {
     -webkit-appearance: none;
     appearance: none;
-    width: 650px;
+    width: 100%;
     height: 10px;
     border-radius: 7.5px;
     background: $white;
@@ -203,4 +205,28 @@ function updateSliderBackground(value: number) {
     }
   }
 }
+
+@media (min-width: 768px) {
+  .timeline {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .timeline__controls {
+    flex-direction: row;
+    gap: 20px;
+  }
+
+  .timeline__slider {
+    width: 600px;
+    justify-content: flex-start;
+  }
+
+  .timeline__input-range {
+
+  }
+}
+
+
 </style>

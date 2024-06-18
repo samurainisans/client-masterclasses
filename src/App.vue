@@ -1,6 +1,5 @@
-<!-- src/App.vue -->
 <template>
-  <div id="app">
+  <div id="app" :class="{ 'has-map': isMapPage }">
     <div class="wrapper">
       <main class="main-content">
         <Nav />
@@ -11,20 +10,25 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted } from 'vue';
-import { useUserStore } from '@/stores/userStore';
-import { useFavoritesStore } from '@/stores/favoritesStore';
-import Nav from '@/components/ui/navigation/Nav.vue';
+import { onMounted, ref, watch } from 'vue'
+import { useRoute } from 'vue-router'
+import Nav from '@/components/ui/navigation/Nav.vue'
 
-const userStore = useUserStore();
-const favoritesStore = useFavoritesStore();
+const isMapPage = ref(false)
 
-onMounted(async () => {
-  if (!userStore.user) {
-    await userStore.checkUser();
-  }
-  await favoritesStore.fetchFavorites();
-});
+const route = useRoute()
+
+const checkIfMapPage = () => {
+  isMapPage.value = route.name?.includes('map') || route.path.includes('map')
+}
+
+onMounted(() => {
+  checkIfMapPage()
+})
+
+watch(route, () => {
+  checkIfMapPage()
+})
 </script>
 
 <style>
@@ -34,7 +38,17 @@ onMounted(async () => {
   padding: 0 20px;
 }
 
+.wrapper:has(.main-container):has(.maps-container) {
+  max-width: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
 .main-content {
   margin-top: 60px;
+}
+
+.has-map .main-content {
+  margin-top: 0 !important;
 }
 </style>

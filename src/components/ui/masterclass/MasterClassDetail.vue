@@ -34,7 +34,10 @@
           <h2>Организатор</h2>
           <p>{{ masterClass.organizer.first_name }} {{ masterClass.organizer.last_name }}</p>
         </div>
-        <div v-if="masterClass.speakers && masterClass.speakers.length" class="masterclass-participants">
+        <div
+          v-if="masterClass.speakers && masterClass.speakers.length"
+          class="masterclass-participants"
+        >
           <h2>Участники</h2>
           <ul>
             <li v-for="speaker in masterClass.speakers" :key="speaker.id">
@@ -46,10 +49,13 @@
           <h2>Адрес</h2>
           <div class="address-info">
             <p v-if="masterClass.street && masterClass.house">
-              <span class="address-label">Улица:</span> {{ masterClass.street }}, {{ masterClass.house }}
+              <span class="address-label">Улица:</span> {{ masterClass.street }},
+              {{ masterClass.house }}
             </p>
             <p v-if="masterClass.locality && masterClass.province && masterClass.country">
-              <span class="address-label">Город:</span> {{ masterClass.locality }}, {{ masterClass.province }}, {{ masterClass.country }}
+              <span class="address-label">Город:</span> {{ masterClass.locality }},
+              {{ masterClass.province }},
+              {{ masterClass.country }}
             </p>
             <p v-if="masterClass.postal_code">
               <span class="address-label">Почтовый индекс:</span> {{ masterClass.postal_code }}
@@ -59,19 +65,21 @@
             <div id="mapContainer" class="map-container"></div>
           </div>
         </div>
-
         <div class="related-events" v-if="relatedEvents.length">
           <h2>Другие мероприятия в этом городе</h2>
-          <div class="events-grid">
-            <MasterClassCard v-for="event in relatedEvents" :key="event.id" :masterClass="event" />
-          </div>
+          <transition-group name="list" tag="div" class="events-grid">
+            <MasterClassCard
+              v-for="event in relatedEvents"
+              :key="event.id"
+              :masterClass="event"
+              class="list-item"
+            />
+          </transition-group>
         </div>
       </div>
-
       <div v-else>
         <p>Загрузка...</p>
       </div>
-
     </div>
   </transition>
 </template>
@@ -84,8 +92,6 @@ import { useRegistrationStore } from '@/stores/registrationStore'
 import MasterClassCard from '@/components/ui/masterclass/MasterClassCard.vue'
 import { fetchMasterClassesByCity } from '@/services/masterClassService'
 import { useToast } from '@/composables/useToast'
-import L from 'leaflet'
-import 'leaflet/dist/leaflet.css'
 
 const route = useRoute()
 const masterClassId = ref(route.params.id)
@@ -167,9 +173,9 @@ const formattedDateTime = computed(() => {
 const registerForClass = async () => {
   try {
     const response = await registrationStore.registerForMasterClass(masterClassId.value)
-    showToast("Успешная регистрация", 'success')
+    showToast('Успешная регистрация', 'success')
   } catch (error) {
-    showToast("Вы уже зарегистрированы на это мероприятие", 'error')
+    showToast('Вы уже зарегистрированы на это мероприятие', 'error')
   }
 }
 
@@ -185,30 +191,33 @@ onMounted(() => {
 })
 </script>
 
-
 <style lang="scss" scoped>
 @import '@/assets/variables';
+.events-grid {
+  display: grid;
+  gap: 32px 24px;
+  width: 100%;
+  justify-content: center;
+
+  grid-template-columns: repeat(auto-fit, minmax(300px, 0fr));
+
+  @media (max-width: 767px) {
+    .list-item {
+      width: 300px;
+      margin: 0 auto;
+    }
+  }
+}
+
 
 body,
 html {
-  background-color: #f0f5fa;
   margin: 0;
   padding: 0;
 }
 
-.masterclass-page {
-  background-color: #f0f5fa;
-}
-
-.masterclass-container {
-  max-width: 1380px;
-  margin: 0 auto;
-  padding: 16px;
-}
-
 .masterclass-header {
   background-color: white;
-  padding: 32px;
   border-radius: 8px;
   margin-bottom: 80px;
 }
@@ -216,18 +225,31 @@ html {
 .masterclass-wrapper {
   display: flex;
   justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 24px;
 }
 
 .masterclass-header__info {
   flex: 1;
+  order: 1;
+}
+
+.masterclass-image {
+  flex: 1;
+  order: 2;
+  margin-left: 24px;
+  display: flex;
+  justify-content: center;
 }
 
 .categories {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
   margin: 24px 0;
 }
 
 .category-button {
-  margin-right: 8px;
   padding: 8px 16px;
   border: 1px solid $green;
   border-radius: 20px;
@@ -244,13 +266,13 @@ html {
 .date-time {
   margin: 12px 0;
   color: #666;
-  font-size: 20px;
+  font-size: 16px;
 }
 
 .location {
   margin: 12px 0;
   font-weight: bold;
-  font-size: 20px;
+  font-size: 16px;
 }
 
 .register-button {
@@ -262,19 +284,18 @@ html {
   border-radius: 4px;
   cursor: pointer;
   margin-top: 24px;
-  font-size: 20px;
+  font-size: 16px;
   transition: background-color 0.3s ease;
-  width: 260px;
-  height: 60px;
+  width: 320px;
+}
 
-  &:hover {
-    background-color: darken($green, 10%);
-  }
+.register-button:hover {
+  background-color: darken($green, 10%);
 }
 
 .masterclass-image img {
   max-width: 100%;
-  height: 100%;
+  height: auto;
   border-radius: 8px;
 }
 
@@ -293,8 +314,6 @@ html {
 .masterclass-participants,
 .masterclass-address,
 .related-events {
-  background-color: #f0f5fa;
-  padding: 32px;
   border-radius: 8px;
   margin-bottom: 80px;
 }
@@ -306,8 +325,8 @@ html {
 .related-events h2 {
   margin-top: 0;
   color: #000;
-  font-size: 32px;
-  margin-bottom: 32px;
+  font-size: 24px;
+  margin-bottom: 24px;
 }
 
 .map-container {
@@ -315,12 +334,6 @@ html {
   height: 450px;
   border-radius: 8px;
   margin-top: 24px;
-}
-
-.events-grid {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 16px;
 }
 
 .fade-enter-active,
@@ -331,5 +344,66 @@ html {
 .fade-enter-from,
 .fade-leave-to {
   opacity: 0;
+}
+
+@media (max-width: 1024px) {
+  .masterclass-header__info {
+    order: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  h1 {
+    text-align: center;
+  }
+
+  .masterclass-image {
+    order: 1;
+    margin-left: 0;
+    margin-top: 24px;
+  }
+
+  .masterclass-wrapper {
+    flex-direction: column;
+  }
+
+  .events-grid {
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 650px) {
+  .masterclass-wrapper {
+    flex-direction: column-reverse;
+  }
+
+  .masterclass-header__info {
+    align-items: normal;
+  }
+
+  h1 {
+    text-align: left;
+  }
+
+  h1 {
+    font-size: 24px;
+  }
+
+  .register-button {
+    width: 100%;
+  }
+
+  .masterclass-image {
+    order: 2;
+  }
+
+  .masterclass-image img {
+    width: 100%;
+  }
+
+  .events-grid {
+    flex-direction: column;
+  }
 }
 </style>

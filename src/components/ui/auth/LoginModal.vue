@@ -1,4 +1,3 @@
-<!-- src/components/ui/auth/LoginModal.vue -->
 <template>
   <div v-if="visible" class="modal-overlay" @click.self="closeModal">
     <div class="modal-content">
@@ -39,6 +38,7 @@
     </div>
   </div>
 </template>
+
 <script lang="ts" setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
@@ -74,7 +74,7 @@ const handleLogin = async () => {
     await userStore.login(loginForm.value)
     showToast('Успешный вход!', 'success')
     closeModal()
-    await router.push({ name: 'Profile' })
+    await router.push({ name: 'Home' })
   } catch (error: any) {
     if (error.response) {
       if (error.response.status === 403) {
@@ -126,6 +126,7 @@ const togglePasswordVisibility = () => {
   justify-content: center;
   align-items: center;
   z-index: 1001;
+  padding: 20px;
 }
 
 .modal-content {
@@ -239,6 +240,104 @@ const togglePasswordVisibility = () => {
 @keyframes spin {
   to {
     transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 1200px) {
+  .modal-content {
+    width: 50%;
+    padding: 30px;
+  }
+  .modal-title {
+    font-size: 22px;
+  }
+  .form-item input[type='text'],
+  .form-item input[type='password'] {
+    font-size: 14px;
+  }
+  .primary-btn {
+    font-size: 14px;
+  }
+
+  .password-item {
+    .toggle-password {
+      font-size: 14px;
+    }
+  }
+
+  .modal-footer {
+    span{
+      font-size: 14px;
+    }
+    .text-btn {
+      font-size: 14px;
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .modal-content {
+    width: 90%;
+    padding: 20px;
+  }
+  .modal-title {
+    font-size: 20px;
+  }
+  .form-item input[type='text'],
+  .form-item input[type='password'] {
+    font-size: 12px;
+  }
+  .primary-btn {
+    font-size: 12px;
+  }
+
+  .password-item {
+    .toggle-password {
+      font-size: 12px;
+    }
+  }
+
+  .modal-footer {
+    span{
+      font-size: 12px;
+    }
+    .text-btn {
+      font-size: 12px;
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .modal-content {
+    width: 100%;
+    padding: 20px;
+    margin: 0 20px;
+  }
+  .modal-title {
+    font-size: 18px;
+  }
+  .form-item input[type='text'],
+  .form-item input[type='password'] {
+    font-size: 12px;
+  }
+  .primary-btn {
+    font-size: 12px;
+  }
+
+  .password-item {
+
+    .toggle-password {
+      font-size: 12px;
+    }
+  }
+
+  .modal-footer {
+    span{
+        font-size: 12px;
+    }
+    .text-btn {
+      font-size: 12px;
+    }
   }
 }
 </style>
