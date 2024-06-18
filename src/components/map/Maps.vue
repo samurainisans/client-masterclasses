@@ -38,7 +38,7 @@ import Timeline from '@/components/map/Timeline.vue'
 import Nav from '@/components/ui/navigation/Nav.vue'
 import AuthModal from '@/components/ui/auth/LoginModal.vue'
 import LayerToggleButton from '@/components/map/LayerToggleButton.vue'
-import L from "leaflet";
+import L from 'leaflet'
 
 const store = useMasterClassesStore()
 const layersStore = useLayersStore()
@@ -74,10 +74,10 @@ let lastZoomTime = 0
 const zoomCooldown = 500 // ms
 
 function handleDataChange({
-                            startDate,
-                            interval,
-                            mode
-                          }: {
+  startDate,
+  interval,
+  mode
+}: {
   startDate: Date
   interval: string
   mode: string

@@ -14,15 +14,15 @@
 </template>
 
 <script setup lang="ts">
-const emits = defineEmits(['close']);
+const emits = defineEmits(['close'])
 
 const closeModal = () => {
-  emits('close');
-};
+  emits('close')
+}
 </script>
 
 <style scoped lang="scss">
-@import "@/assets/variables";
+@import '@/assets/variables';
 .modal-backdrop {
   position: fixed;
   top: 0;

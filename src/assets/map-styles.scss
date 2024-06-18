@@ -1,4 +1,4 @@
-@import "/src/assets/variables.scss";
+@import '/src/assets/variables.scss';
 
 /* Общие стили для контейнеров */
 .controls-container {
@@ -11,8 +11,8 @@
   right: 0;
   gap: 20px;
   width: -webkit-fill-available;
-  width: -moz-available;          /* WebKit игнор. */
-  width: -webkit-fill-available;  /* Mozilla игнор. */
+  width: -moz-available; /* WebKit игнор. */
+  width: -webkit-fill-available; /* Mozilla игнор. */
   width: fill-available;
 }
 

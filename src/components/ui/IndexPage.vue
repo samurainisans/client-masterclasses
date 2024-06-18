@@ -68,9 +68,12 @@ const goToLastPage = () => {
   currentPage.value = totalPages.value
 }
 
-watch(() => masterClassesStore.getMasterClasses, () => {
-  currentPage.value = 1
-})
+watch(
+  () => masterClassesStore.getMasterClasses,
+  () => {
+    currentPage.value = 1
+  }
+)
 </script>
 
 <style scoped lang="scss">

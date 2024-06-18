@@ -1,48 +1,49 @@
 /*src/assets/style.scss*/
-@import "variables.scss";
-@import "button-styles.scss";
-@import "select-styles.scss";
+@import 'variables.scss';
+@import 'button-styles.scss';
+@import 'select-styles.scss';
 
 :root {
-    padding: 0;
-    line-height: 1.5;
-    font-weight: 400;
-    --font-family: "Inter", sans-serif;
-    --second-family: "Lato", sans-serif;
-    font-family: var(--font-family);
+  padding: 0;
+  line-height: 1.5;
+  font-weight: 400;
+  --font-family: 'Inter', sans-serif;
+  --second-family: 'Lato', sans-serif;
+  font-family: var(--font-family);
 }
 
 * {
-    margin: 0;
+  margin: 0;
 }
 
 .image-container img {
-    width: 300px;
+  width: 300px;
 }
 
 .dp__outer_menu_wrap {
-    margin-top: 10px;
+  margin-top: 10px;
 }
 
 .dp_menu {
-    font-size: 13px;
+  font-size: 13px;
 }
 
 body {
-    font-family: "Inter", sans-serif;;
+  font-family: 'Inter', sans-serif;
 }
 
 input {
-    font-family: inherit;
+  font-family: inherit;
 }
 
-.fade-enter-active, .fade-leave-active {
-    transition: opacity 0.5s ease;
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.5s ease;
 }
-.fade-enter, .fade-leave-to  {
-    opacity: 0;
+.fade-enter,
+.fade-leave-to {
+  opacity: 0;
 }
-
 
 /*.loading-overlay {*/
 /*    position: absolute;*/
@@ -88,11 +89,11 @@ input {
 /*    opacity: 0.7;*/
 /*}*/
 
-.fade-enter-active, .fade-leave-active {
-    transition: opacity 0.5s;
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.5s;
 }
 
-.fade-enter, .fade-leave-to /* .fade-leave-active in <2.1.8 */
-{
-    opacity: 0;
+.fade-enter, .fade-leave-to /* .fade-leave-active in <2.1.8 */ {
+  opacity: 0;
 }

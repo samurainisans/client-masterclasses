@@ -1,21 +1,21 @@
 <!-- SelectComponent.vue -->
 <script setup lang="ts">
-import { ref} from 'vue';
+import { ref } from 'vue'
 
 const props = defineProps<{
-  options: string[],
+  options: string[]
   modelValue: string
-}>();
+}>()
 
 const emit = defineEmits<{
   (e: 'update:modelValue', value: string): void
-}>();
+}>()
 
-const selectedValue = ref(props.modelValue);
+const selectedValue = ref(props.modelValue)
 
 function handleChange(event: Event) {
-  const newValue = (event.target as HTMLSelectElement).value;
-  emit('update:modelValue', newValue);
+  const newValue = (event.target as HTMLSelectElement).value
+  emit('update:modelValue', newValue)
 }
 </script>
 
@@ -28,6 +28,5 @@ function handleChange(event: Event) {
 </template>
 
 <style scoped lang="scss">
-@import "@/assets/select-styles";
-
+@import '@/assets/select-styles';
 </style>

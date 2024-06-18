@@ -46,14 +46,14 @@
 import { ref, computed, watch, onMounted, onBeforeUnmount } from 'vue'
 
 interface Item {
-  value: number | string;
-  label: string;
+  value: number | string
+  label: string
 }
 
 const props = defineProps<{
-  items: Item[];
-  buttonText?: string;
-  inline?: boolean;
+  items: Item[]
+  buttonText?: string
+  inline?: boolean
 }>()
 
 const selectedItems = ref<(number | string)[]>([])

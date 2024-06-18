@@ -134,7 +134,6 @@ watch([selectedCategories, selectedCities, store.startDate, store.endDate] as an
 })
 </script>
 
-
 <style scoped lang="scss">
 @import '@/assets/variables';
 
@@ -216,7 +215,6 @@ watch([selectedCategories, selectedCities, store.startDate, store.endDate] as an
 
   @media (max-width: 768px) {
     margin: 0px 0px 20px 0px;
-
   }
 }
 

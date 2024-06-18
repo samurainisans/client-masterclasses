@@ -1,43 +1,55 @@
 <!-- src/components/map/LayerToggleButton.vue -->
 <script setup lang="ts">
-import { useLayersStore } from '@/stores/layersStore';
-import L from 'leaflet';
+import { useLayersStore } from '@/stores/layersStore'
+import L from 'leaflet'
 
 const layers = [
-  { name: 'Кластеризация', inactiveSrc: '/src/assets/imgs/layers/inactive/clasterisation.png', activeSrc: '/src/assets/imgs/layers/active/clasterisation.png' },
-  { name: 'Теплокарты', inactiveSrc: '/src/assets/imgs/layers/inactive/heatmap.png', activeSrc: '/src/assets/imgs/layers/active/heatmap.png' },
-  { name: 'Хороплет', inactiveSrc: '/src/assets/imgs/layers/inactive/horoplet.png', activeSrc: '/src/assets/imgs/layers/active/horoplet.png' }
-];
+  {
+    name: 'Кластеризация',
+    inactiveSrc: '/src/assets/imgs/layers/inactive/clasterisation.png',
+    activeSrc: '/src/assets/imgs/layers/active/clasterisation.png'
+  },
+  {
+    name: 'Теплокарты',
+    inactiveSrc: '/src/assets/imgs/layers/inactive/heatmap.png',
+    activeSrc: '/src/assets/imgs/layers/active/heatmap.png'
+  },
+  {
+    name: 'Хороплет',
+    inactiveSrc: '/src/assets/imgs/layers/inactive/horoplet.png',
+    activeSrc: '/src/assets/imgs/layers/active/horoplet.png'
+  }
+]
 
 const props = defineProps<{
-  displayedMasterClasses: any[],
+  displayedMasterClasses: any[]
   myIcon: L.Icon<L.IconOptions>
-}>();
+}>()
 
-const layersStore = useLayersStore();
+const layersStore = useLayersStore()
 
 const selectLayer = (index: number) => {
-  layersStore.activeLayer = index;
-  layersStore.toggleLayer(index, props.displayedMasterClasses, props.myIcon);
-};
+  layersStore.activeLayer = index
+  layersStore.toggleLayer(index, props.displayedMasterClasses, props.myIcon)
+}
 </script>
 
 <template>
   <div class="modal-window">
     <span>Картографическая основа</span>
     <div class="wrapper-layers">
-      <div
-        v-for="(layer, index) in layers"
-        :key="index"
-        class="layer"
-        @click="selectLayer(index)"
-      >
+      <div v-for="(layer, index) in layers" :key="index" class="layer" @click="selectLayer(index)">
         <img
           :src="layersStore.activeLayer === index ? layer.activeSrc : layer.inactiveSrc"
           :class="{ 'active-layer': layersStore.activeLayer === index }"
-          @mouseenter="e => (e.target as HTMLImageElement).src = layer.activeSrc"
-          @mouseleave="e => (e.target as HTMLImageElement).src = layersStore.activeLayer === index ? layer.activeSrc : layer.inactiveSrc"
-          alt="">
+          @mouseenter="(e) => ((e.target as HTMLImageElement).src = layer.activeSrc)"
+          @mouseleave="
+            (e) =>
+              ((e.target as HTMLImageElement).src =
+                layersStore.activeLayer === index ? layer.activeSrc : layer.inactiveSrc)
+          "
+          alt=""
+        />
         <div class="layer-name">{{ layer.name }}</div>
       </div>
     </div>
@@ -45,7 +57,7 @@ const selectLayer = (index: number) => {
 </template>
 
 <style scoped lang="scss">
-@import "@/assets/variables";
+@import '@/assets/variables';
 
 .modal-window {
   padding: 6px 10px 5px 10px;

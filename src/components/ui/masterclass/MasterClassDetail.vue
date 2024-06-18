@@ -102,14 +102,14 @@ interface Coordinates {
 interface MasterClass {
   id: number
   title: string
-  categories: Array<{ id: number, name: string }>
+  categories: Array<{ id: number; name: string }>
   start_date: string
   end_date: string
   locality: string
   image_url: string | null
   description: string
-  organizer: { first_name: string, last_name: string }
-  speakers: Array<{ id: number, first_name: string, last_name: string }>
+  organizer: { first_name: string; last_name: string }
+  speakers: Array<{ id: number; first_name: string; last_name: string }>
   street?: string
   house?: string
   province?: string
@@ -216,7 +216,6 @@ onMounted(() => {
 })
 </script>
 
-
 <style lang="scss" scoped>
 @import '@/assets/variables';
 .events-grid {
@@ -234,7 +233,6 @@ onMounted(() => {
     }
   }
 }
-
 
 body,
 html {

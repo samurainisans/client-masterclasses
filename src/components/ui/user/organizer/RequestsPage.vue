@@ -1,51 +1,51 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
-import { useRoute } from 'vue-router';
-import axios from 'axios';
-import { useToast } from '@/composables/useToast';
+import { ref, onMounted } from 'vue'
+import { useRoute } from 'vue-router'
+import axios from 'axios'
+import { useToast } from '@/composables/useToast'
 
 interface User {
-  id: number;
-  username: string;
-  first_name: string;
-  last_name: string;
-  email: string;
+  id: number
+  username: string
+  first_name: string
+  last_name: string
+  email: string
 }
 
 interface Registration {
-  user: User;
-  register_state: string;
-  date_register: string;
+  user: User
+  register_state: string
+  date_register: string
 }
 
 interface ErrorResponse {
   response?: {
     data?: {
-      detail?: string;
-    };
-  };
+      detail?: string
+    }
+  }
 }
 
-const route = useRoute();
-const masterClassId = ref<string | string[]>(route.params.id);
-const registrations = ref<Registration[]>([]);
-const { showToast } = useToast();
+const route = useRoute()
+const masterClassId = ref<string | string[]>(route.params.id)
+const registrations = ref<Registration[]>([])
+const { showToast } = useToast()
 
 const fetchRegistrations = async () => {
   try {
-    const response = await axios.get(`/api/masterclasses/${masterClassId.value}/registrations/`);
-    registrations.value = response.data;
+    const response = await axios.get(`/api/masterclasses/${masterClassId.value}/registrations/`)
+    registrations.value = response.data
   } catch (err) {
-    const error = err as ErrorResponse;
-    const errorMessage = error.response?.data?.detail || 'Ошибка загрузки заявок';
-    showToast(errorMessage, 'error');
-    console.error('Ошибка загрузки заявок:', error.response?.data || error);
+    const error = err as ErrorResponse
+    const errorMessage = error.response?.data?.detail || 'Ошибка загрузки заявок'
+    showToast(errorMessage, 'error')
+    console.error('Ошибка загрузки заявок:', error.response?.data || error)
   }
-};
+}
 
 onMounted(() => {
-  fetchRegistrations();
-});
+  fetchRegistrations()
+})
 </script>
 
 <template>
@@ -58,7 +58,10 @@ onMounted(() => {
         <p><strong>Фамилия:</strong> {{ registration.user.last_name }}</p>
         <p><strong>Email:</strong> {{ registration.user.email }}</p>
         <p><strong>Статус:</strong> {{ registration.register_state }}</p>
-        <p><strong>Дата регистрации:</strong> {{ new Date(registration.date_register).toLocaleString() }}</p>
+        <p>
+          <strong>Дата регистрации:</strong>
+          {{ new Date(registration.date_register).toLocaleString() }}
+        </p>
       </li>
     </ul>
   </div>

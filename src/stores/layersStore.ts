@@ -1,34 +1,47 @@
-// src/stores/layersStore.ts
-import { defineStore } from 'pinia';
-import { ref } from 'vue';
-import { SubData } from '@/assets/output.js';
+import { defineStore } from 'pinia'
+import { ref } from 'vue'
+import { SubData } from '@/assets/output.js'
+import L, {
+  type GeoJSONOptions,
+  type LatLngExpression,
+  type Layer,
+  type GeoJSON,
+  type Map
+} from 'leaflet'
+import 'leaflet.heat'
+import 'leaflet.markercluster'
 
 export const useLayersStore = defineStore('layersStore', () => {
-  const activeLayer = ref<number>(0);
-  const activeLayerIndex = ref<number>(-1);
-  const map = ref<L.Map | null>(null);
-  const markers = ref(L.markerClusterGroup());
-  const heatmapLayer = ref<L.Layer | null>(null);
-  const geoJsonLayer = ref<L.GeoJSON | null>(null);
-  const eventCountByRegion = ref<any>({});
+  const activeLayer = ref<number>(0)
+  const activeLayerIndex = ref<number>(-1)
+  const map = ref<L.Map | null>(null)
+  const markers = ref(L.markerClusterGroup())
+  const heatmapLayer = ref<Layer | null>(null)
+  const geoJsonLayer = ref<L.GeoJSON | null>(null)
+  const eventCountByRegion = ref<Record<string, number>>({})
 
   function initializeMap(mapInstance: L.Map) {
-    map.value = mapInstance;
+    map.value = mapInstance
   }
 
   function updateMarkers(displayedMasterClasses: any[], myIcon: L.Icon) {
-    if (!map.value) return;
+    if (!map.value) return
 
-    markers.value.clearLayers();
+    markers.value.clearLayers()
 
     displayedMasterClasses.forEach((item, index) => {
-      const { latitude, longitude } = item.coordinates || {};
+      const { latitude, longitude } = item.coordinates || {}
 
-      if (latitude === undefined || longitude === undefined || isNaN(latitude) || isNaN(longitude)) {
-        return;
+      if (
+        latitude === undefined ||
+        longitude === undefined ||
+        isNaN(latitude) ||
+        isNaN(longitude)
+      ) {
+        return
       }
 
-      const marker = L.marker([latitude, longitude], { icon: myIcon })
+      const marker = L.marker([latitude, longitude] as LatLngExpression, { icon: myIcon })
         .on('mouseover', () => {
           if (!marker.getPopup()) {
             marker.bindPopup(`
@@ -43,106 +56,125 @@ export const useLayersStore = defineStore('layersStore', () => {
                   <span>${new Date(item.start_date).toLocaleDateString()}</span>
                 </div>
               </div>
-            </div>`);
+            </div>`)
           }
-          marker.openPopup();
+          marker.openPopup()
         })
         .on('mouseout', () => {
           setTimeout(() => {
             if (!marker.isPopupOpen()) {
-              marker.closePopup();
+              marker.closePopup()
             }
-          }, 300);
-        });
+          }, 300)
+        })
 
       marker.on('popupopen', () => {
-        const popup = document.getElementById(`popup-image-${index}`);
+        const popup = document.getElementById(`popup-image-${index}`)
         if (popup) {
           popup.addEventListener('mouseover', () => {
-            clearTimeout(marker._closeTimeout);
-          });
+            clearTimeout((marker as any)._closeTimeout)
+          })
           popup.addEventListener('mouseout', () => {
-            marker._closeTimeout = setTimeout(() => {
-              marker.closePopup();
-            }, 300);
-          });
+            ;(marker as any)._closeTimeout = setTimeout(() => {
+              marker.closePopup()
+            }, 300)
+          })
         }
-      });
+      })
 
-      markers.value.addLayer(marker);
-    });
+      markers.value.addLayer(marker)
+    })
 
     if (map.value && markers.value) {
-      map.value.addLayer(markers.value);
+      map.value.addLayer(markers.value as unknown as Layer)
     }
   }
 
   function updateHeatmap(displayedMasterClasses: any[]) {
-    if (!map.value) return;
+    if (!map.value) return
 
     if (heatmapLayer.value) {
-      map.value.removeLayer(heatmapLayer.value);
+      map.value.removeLayer(heatmapLayer.value as Layer)
     }
 
-    const heatData = displayedMasterClasses.map(item => {
-      const { latitude, longitude } = item.coordinates || {};
+    const heatData = displayedMasterClasses
+      .map((item) => {
+        const { latitude, longitude } = item.coordinates || {}
 
-      if (latitude === undefined || longitude === undefined || isNaN(latitude) || isNaN(longitude)) {
-        return null;
-      }
-      return [latitude, longitude, 300];
-    }).filter(item => item !== null);
+        if (
+          latitude === undefined ||
+          longitude === undefined ||
+          isNaN(latitude) ||
+          isNaN(longitude)
+        ) {
+          return null
+        }
+        return [latitude, longitude, 300] as [number, number, number]
+      })
+      .filter((item) => item !== null) as [number, number, number][]
 
-    heatmapLayer.value = L.heatLayer(heatData, { radius: 25 });
+    heatmapLayer.value = (L as any).heatLayer(heatData, { radius: 25 }) as Layer
 
     if (map.value && heatmapLayer.value) {
-      heatmapLayer.value.addTo(map.value);
+      heatmapLayer.value.addTo(map.value as L.Map)
     }
   }
 
   function aggregateEventCounts(displayedMasterClasses: any[]) {
-    const counts = {};
+    const counts: Record<string, number> = {}
 
-    displayedMasterClasses.forEach(item => {
-      const { latitude, longitude } = item.coordinates || {};
+    displayedMasterClasses.forEach((item) => {
+      const { latitude, longitude } = item.coordinates || {}
 
-      if (latitude === undefined || longitude === undefined || isNaN(latitude) || isNaN(longitude)) {
-        return;
+      if (
+        latitude === undefined ||
+        longitude === undefined ||
+        isNaN(latitude) ||
+        isNaN(longitude)
+      ) {
+        return
       }
-      const point = L.latLng(latitude, longitude);
-      SubData.features.forEach(feature => {
-        const polygon = L.geoJSON(feature).getLayers()[0];
+      const point = L.latLng(latitude, longitude)
+      SubData.features.forEach((feature: any) => {
+        const polygon = L.geoJSON(feature).getLayers()[0] as L.Polygon
         if (polygon.getBounds().contains(point)) {
-          const region = feature.properties.name;
-          if (!counts[region]) counts[region] = 0;
-          counts[region]++;
+          const region = feature.properties.name
+          if (!counts[region]) counts[region] = 0
+          counts[region]++
         }
-      });
-    });
+      })
+    })
 
-    eventCountByRegion.value = counts;
+    eventCountByRegion.value = counts
   }
 
   function updateChoropleth() {
-    if (!map.value) return;
+    if (!map.value) return
 
     if (geoJsonLayer.value) {
-      map.value.removeLayer(geoJsonLayer.value);
+      map.value.removeLayer(geoJsonLayer.value as GeoJSON)
     }
 
-    function getColor(eventCount) {
-      return eventCount > 100 ? '#800026' :
-        eventCount > 50 ? '#BD0026' :
-          eventCount > 20 ? '#E31A1C' :
-            eventCount > 10 ? '#FC4E2A' :
-              eventCount > 5 ? '#FD8D3C' :
-                eventCount > 2 ? '#FEB24C' :
-                  eventCount > 1 ? '#FED976' :
-                    '#81817f';
+    function getColor(eventCount: number) {
+      return eventCount > 100
+        ? '#800026'
+        : eventCount > 50
+          ? '#BD0026'
+          : eventCount > 20
+            ? '#E31A1C'
+            : eventCount > 10
+              ? '#FC4E2A'
+              : eventCount > 5
+                ? '#FD8D3C'
+                : eventCount > 2
+                  ? '#FEB24C'
+                  : eventCount > 1
+                    ? '#FED976'
+                    : '#81817f'
     }
 
-    function style(feature) {
-      const eventCount = eventCountByRegion.value[feature.properties.name] || 0;
+    function style(feature: any) {
+      const eventCount = eventCountByRegion.value[feature.properties.name] || 0
       return {
         fillColor: getColor(eventCount),
         weight: 2,
@@ -150,63 +182,71 @@ export const useLayersStore = defineStore('layersStore', () => {
         color: 'white',
         dashArray: '3',
         fillOpacity: 0.7
-      };
+      }
     }
 
-    function onEachFeature(feature, layer) {
-      const eventCount = eventCountByRegion.value[feature.properties.name] || 0;
+    function onEachFeature(feature: any, layer: L.Layer) {
+      const eventCount = eventCountByRegion.value[feature.properties.name] || 0
       layer.on({
-        mouseover: (e) => {
-          const layer = e.target;
+        mouseover: (e: any) => {
+          const layer = e.target
           layer.setStyle({
             weight: 5,
             color: '#666',
             dashArray: '',
             fillOpacity: 0.7
-          });
-          layer.bindPopup(`Количество мероприятий: ${eventCount}`).openPopup();
+          })
+          layer.bindPopup(`Количество мероприятий: ${eventCount}`).openPopup()
         },
-        mouseout: (e) => {
+        mouseout: (e: any) => {
           if (geoJsonLayer.value) {
-            geoJsonLayer.value.resetStyle(e.target);
-            layer.closePopup();
+            geoJsonLayer.value.resetStyle(e.target)
+            layer.closePopup()
           }
         }
-      });
+      })
     }
 
     geoJsonLayer.value = L.geoJSON(SubData, {
       style,
       onEachFeature
-    });
+    } as GeoJSONOptions)
 
     if (map.value && geoJsonLayer.value) {
-      geoJsonLayer.value.addTo(map.value);
+      geoJsonLayer.value.addTo(map.value as Map)
     }
   }
 
   function toggleLayer(index: number, displayedMasterClasses: any[], myIcon: L.Icon) {
-    activeLayerIndex.value = index;
+    activeLayerIndex.value = index
 
     if (heatmapLayer.value) {
-      if (map.value) map.value.removeLayer(heatmapLayer.value);
+      if (map.value) map.value.removeLayer(heatmapLayer.value as Layer)
     }
     if (geoJsonLayer.value) {
-      if (map.value) map.value.removeLayer(geoJsonLayer.value);
+      if (map.value) map.value.removeLayer(geoJsonLayer.value as GeoJSON)
     }
     if (map.value && markers.value) {
-      map.value.removeLayer(markers.value);
+      map.value.removeLayer(markers.value as unknown as Layer)
     }
 
     if (index === 1) {
-      updateHeatmap(displayedMasterClasses);
+      updateHeatmap(displayedMasterClasses)
     } else if (index === 2) {
-      aggregateEventCounts(displayedMasterClasses);
-      updateChoropleth();
+      aggregateEventCounts(displayedMasterClasses)
+      updateChoropleth()
     } else {
-      updateMarkers(displayedMasterClasses, myIcon);
+      updateMarkers(displayedMasterClasses, myIcon)
     }
   }
 
-  return { activeLayer, activeLayerIndex, initializeMap, toggleLayer, updateMarkers, updateHeatmap, updateChoropleth };
-});
+  return {
+    activeLayer,
+    activeLayerIndex,
+    initializeMap,
+    toggleLayer,
+    updateMarkers,
+    updateHeatmap,
+    updateChoropleth
+  }
+})

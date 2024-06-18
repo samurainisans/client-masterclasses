@@ -266,7 +266,7 @@ const togglePasswordVisibility = () => {
   }
 
   .modal-footer {
-    span{
+    span {
       font-size: 14px;
     }
     .text-btn {
@@ -298,7 +298,7 @@ const togglePasswordVisibility = () => {
   }
 
   .modal-footer {
-    span{
+    span {
       font-size: 12px;
     }
     .text-btn {
@@ -325,15 +325,14 @@ const togglePasswordVisibility = () => {
   }
 
   .password-item {
-
     .toggle-password {
       font-size: 12px;
     }
   }
 
   .modal-footer {
-    span{
-        font-size: 12px;
+    span {
+      font-size: 12px;
     }
     .text-btn {
       font-size: 12px;

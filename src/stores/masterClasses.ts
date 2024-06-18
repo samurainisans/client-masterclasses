@@ -23,12 +23,10 @@ type User = {
   image: string | null
 }
 
-
 export type Category = {
   id: number
   name: string
 }
-
 
 type MasterClass = {
   id: number

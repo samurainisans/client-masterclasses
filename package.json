@@ -1,6 +1,6 @@
 {
   "name": "vue-client-masterclass",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "private": true,
   "type": "module",
   "scripts": {
@@ -14,6 +14,7 @@
   },
   "dependencies": {
     "-": "^0.0.1",
+    "@types/leaflet.heat": "^0.2.4",
     "@types/leaflet.markercluster": "^1.5.4",
     "@vueform/multiselect": "^2.6.7",
     "@vueform/vueform": "^1.9.9",

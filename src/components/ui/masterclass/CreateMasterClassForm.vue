@@ -196,7 +196,10 @@ const speakers = ref<Speaker[]>([])
 const fetchCategories = async () => {
   try {
     const data = await masterClassesStore.fetchCategories()
-    categories.value = (data || []).map((category: any) => ({ value: category.id, label: category.name }))
+    categories.value = (data || []).map((category: any) => ({
+      value: category.id,
+      label: category.name
+    }))
   } catch (error) {
     console.error('Error fetching categories:', error)
   }
@@ -246,8 +249,7 @@ onMounted(async () => {
       zoom: 10
     })
 
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    }).addTo(map)
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {}).addTo(map)
 
     map!.on('click', async (e: L.LeafletMouseEvent) => {
       const { lat, lng } = e.latlng

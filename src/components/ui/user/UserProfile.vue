@@ -67,105 +67,109 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, computed } from 'vue';
-import { useUserStore } from '@/stores/userStore';
-import { formatDate } from '@/utils/formatDate';
-import { rolesDictionary } from '@/utils/rolesDictionary';
-import { useToast } from '@/composables/useToast';
-import { useRouter } from 'vue-router';
-import { userService } from '@/services/usersService';
+import { ref, computed } from 'vue'
+import { useUserStore } from '@/stores/userStore'
+import { formatDate } from '@/utils/formatDate'
+import { rolesDictionary } from '@/utils/rolesDictionary'
+import { useToast } from '@/composables/useToast'
+import { useRouter } from 'vue-router'
+import { userService } from '@/services/usersService'
 
 interface User {
-  id: number;
-  username: string;
-  role: string;
-  first_name?: string;
-  last_name?: string;
-  email?: string;
-  date_joined?: string;
-  bio?: string;
-  age?: number;
-  gender?: string;
-  image?: string;
+  id: number
+  username: string
+  role: string
+  first_name?: string
+  last_name?: string
+  email?: string
+  date_joined?: string
+  bio?: string
+  age?: number
+  gender?: string
+  image?: string
 }
 
-const userStore = useUserStore();
-const user = computed<User | null>(() => userStore.user);
-const translatedRole = computed(() => rolesDictionary[user.value?.role as string] || user.value?.role);
-const router = useRouter();
-const { showToast } = useToast();
+const userStore = useUserStore()
+const user = computed<User | null>(() => userStore.user)
+const translatedRole = computed(
+  () => rolesDictionary[user.value?.role as string] || user.value?.role
+)
+const router = useRouter()
+const { showToast } = useToast()
 
-const editMode = ref(false);
-const editableUser = ref<Partial<User>>({ ...user.value });
-const newAvatar = ref<File | null>(null);
+const editMode = ref(false)
+const editableUser = ref<Partial<User>>({ ...user.value })
+const newAvatar = ref<File | null>(null)
 
 const fullImageUrl = computed(() => {
   if (user.value?.image) {
-    return user.value.image.startsWith('http') ? user.value.image : `http://localhost:8000${user.value.image}`;
+    return user.value.image.startsWith('http')
+      ? user.value.image
+      : `http://localhost:8000${user.value.image}`
   }
-  return '';
-});
+  return ''
+})
 
 const enableEditMode = () => {
-  editableUser.value = { ...user.value };
-  editMode.value = true;
-};
+  editableUser.value = { ...user.value }
+  editMode.value = true
+}
 
 const cancelEdit = () => {
-  editMode.value = false;
-};
+  editMode.value = false
+}
 
 const saveChanges = async () => {
   try {
-    const formData = new FormData();
-    formData.append('username', editableUser.value.username as string);
-    formData.append('email', editableUser.value.email as string);
-    formData.append('first_name', editableUser.value.first_name || '');
-    formData.append('last_name', editableUser.value.last_name || '');
-    formData.append('bio', editableUser.value.bio || '');
-    formData.append('age', editableUser.value.age?.toString() || '');
-    formData.append('gender', editableUser.value.gender || '');
+    const formData = new FormData()
+    formData.append('username', editableUser.value.username as string)
+    formData.append('email', editableUser.value.email as string)
+    formData.append('first_name', editableUser.value.first_name || '')
+    formData.append('last_name', editableUser.value.last_name || '')
+    formData.append('bio', editableUser.value.bio || '')
+    formData.append('age', editableUser.value.age?.toString() || '')
+    formData.append('gender', editableUser.value.gender || '')
     if (newAvatar.value) {
-      formData.append('image', newAvatar.value);
+      formData.append('image', newAvatar.value)
     }
 
-    const response = await userService.updateUser(user.value!.id, formData);
-    console.log(JSON.stringify(response.data, null, 2));
+    const response = await userService.updateUser(user.value!.id, formData)
+    console.log(JSON.stringify(response.data, null, 2))
     if (response.status === 200) {
-      await userStore.fetchUser(user.value!.id);
-      showToast(response.data.message, 'success');
-      editMode.value = false;
-      router.go(0);
+      await userStore.fetchUser(user.value!.id)
+      showToast(response.data.message, 'success')
+      editMode.value = false
+      router.go(0)
     }
   } catch (error) {
-    const err = error as { message: string };
-    console.error('Error during saveChanges:', error);
-    showToast(`Ошибка при сохранении изменений: ${err.message}`, 'error');
+    const err = error as { message: string }
+    console.error('Error during saveChanges:', error)
+    showToast(`Ошибка при сохранении изменений: ${err.message}`, 'error')
   }
-};
+}
 
 const onImageChange = (event: Event) => {
-  const target = event.target as HTMLInputElement;
+  const target = event.target as HTMLInputElement
   if (target.files && target.files.length > 0) {
-    newAvatar.value = target.files[0];
+    newAvatar.value = target.files[0]
   }
-};
+}
 
 const confirmLogout = () => {
-  if (confirm("Вы уверены, что хотите выйти?")) {
-    logout();
+  if (confirm('Вы уверены, что хотите выйти?')) {
+    logout()
   }
-};
+}
 
 const logout = () => {
-  userStore.logout();
-  showToast('Вы успешно вышли из системы', 'success');
-  router.push({ name: 'Home' });
-};
+  userStore.logout()
+  showToast('Вы успешно вышли из системы', 'success')
+  router.push({ name: 'Home' })
+}
 </script>
 
 <style scoped lang="scss">
-@import "@/assets/variables";
+@import '@/assets/variables';
 
 .user-profile__image {
   width: 250px;

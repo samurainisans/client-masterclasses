@@ -22,7 +22,8 @@
           v-if="extraCategoriesCount > 0"
           class="extra-categories"
           @click.stop="showAllCategories"
-        >{{ extraCategoriesCount }}+</span>
+          >{{ extraCategoriesCount }}+</span
+        >
       </div>
       <h3>
         <router-link :to="{ name: 'MasterClassDetail', params: { id: masterClass.id } }">
@@ -48,7 +49,8 @@
               class="category-chip"
               v-for="category in masterClass.categories"
               :key="category.id"
-            >{{ category.name }}</span>
+              >{{ category.name }}</span
+            >
           </div>
         </div>
       </div>
@@ -57,77 +59,76 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue';
-import { useFavoritesStore } from '@/stores/favoritesStore';
-import { useToast } from '@/composables/useToast';
-import Cookies from 'js-cookie';
+import { ref, computed } from 'vue'
+import { useFavoritesStore } from '@/stores/favoritesStore'
+import { useToast } from '@/composables/useToast'
+import Cookies from 'js-cookie'
 
 const props = defineProps({
   masterClass: {
     type: Object,
     required: true,
-    default: () => ({}),
-  },
-});
-const isModalOpen = ref(false);
-const favoritesStore = useFavoritesStore();
-const { showToast } = useToast();
+    default: () => ({})
+  }
+})
+const isModalOpen = ref(false)
+const favoritesStore = useFavoritesStore()
+const { showToast } = useToast()
 
 const formattedDateTime = computed(() => {
-  if (!props.masterClass.start_date || !props.masterClass.end_date) return '';
+  if (!props.masterClass.start_date || !props.masterClass.end_date) return ''
 
-  const startDate = new Date(props.masterClass.start_date);
-  const endDate = new Date(props.masterClass.end_date);
-  const options = { month: 'long', day: 'numeric' } as const;
-  const startTime = startDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-  const endTime = endDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-  return `${startDate.toLocaleDateString('ru-RU', options)}, с ${startTime} до ${endTime} по местному времени`;
-});
+  const startDate = new Date(props.masterClass.start_date)
+  const endDate = new Date(props.masterClass.end_date)
+  const options = { month: 'long', day: 'numeric' } as const
+  const startTime = startDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+  const endTime = endDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+  return `${startDate.toLocaleDateString('ru-RU', options)}, с ${startTime} до ${endTime} по местному времени`
+})
 
 const mainCategory = computed(() => {
-  return props.masterClass.categories[0]?.name || '';
-});
+  return props.masterClass.categories[0]?.name || ''
+})
 
 const extraCategoriesCount = computed(() => {
-  return props.masterClass.categories.length - 1;
-});
+  return props.masterClass.categories.length - 1
+})
 
 const showAllCategories = () => {
-  isModalOpen.value = true;
-};
+  isModalOpen.value = true
+}
 
 const isFavorite = computed(() => {
-  return favoritesStore.isFavorite(props.masterClass.id);
-});
+  return favoritesStore.isFavorite(props.masterClass.id)
+})
 
-const BASE_URL = 'http://localhost:8000'; // Замените на ваш реальный базовый URL
+const BASE_URL = 'http://localhost:8000' // Замените на ваш реальный базовый URL
 
 const fullImageUrl = computed(() => {
   if (!props.masterClass.image_url) {
-    return '/default-image.jpg'; // Замените на ваш реальный URL по умолчанию
+    return '/default-image.jpg' // Замените на ваш реальный URL по умолчанию
   }
   if (props.masterClass.image_url.startsWith('/')) {
-    return `${BASE_URL}${props.masterClass.image_url}`;
+    return `${BASE_URL}${props.masterClass.image_url}`
   }
-  return props.masterClass.image_url;
-});
+  return props.masterClass.image_url
+})
 
 const toggleFavorite = () => {
-  const accessToken = Cookies.get('access_token');
+  const accessToken = Cookies.get('access_token')
   if (!accessToken) {
-    showToast('Вы не авторизованы', 'warning');
-    return;
+    showToast('Вы не авторизованы', 'warning')
+    return
   }
 
   if (isFavorite.value) {
-    favoritesStore.removeFavorite(props.masterClass.id);
-    showToast('Удалено из избранного', 'error');
+    favoritesStore.removeFavorite(props.masterClass.id)
+    showToast('Удалено из избранного', 'error')
   } else {
-    favoritesStore.addFavorite(props.masterClass.id);
-    showToast('Добавлено в избранное', 'success');
+    favoritesStore.addFavorite(props.masterClass.id)
+    showToast('Добавлено в избранное', 'success')
   }
-};
-
+}
 </script>
 
 <style scoped lang="scss">

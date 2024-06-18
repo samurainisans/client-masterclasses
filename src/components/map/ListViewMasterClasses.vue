@@ -1,16 +1,20 @@
 <template>
   <div class="sidebar-container__wrapper">
-    <div :class="['sidebar-container', { 'closed': !sidebarStore.isOpen }]">
-      <div :class="['list-container', { 'closed': !sidebarStore.isOpen }]" ref="listContainerRef">
+    <div :class="['sidebar-container', { closed: !sidebarStore.isOpen }]">
+      <div :class="['list-container', { closed: !sidebarStore.isOpen }]" ref="listContainerRef">
         <ul class="mk-list">
           <li v-for="mc in masterClasses" :key="mc.id" class="card-item">
             <div class="image-container">
-              <img :src="mc.image_url || '/default-image.jpg'" alt="image" class="card-image">
-              <button class="favorite-btn"><img src="/src/assets/imgs/favorite.svg" alt="favorite"></button>
+              <img :src="mc.image_url || '/default-image.jpg'" alt="image" class="card-image" />
+              <button class="favorite-btn">
+                <img src="/src/assets/imgs/favorite.svg" alt="favorite" />
+              </button>
             </div>
             <div class="card-content">
               <div class="categories">
-                <span class="category-chip" v-for="category in mc.categories" :key="category.id">{{ category.name }}</span>
+                <span class="category-chip" v-for="category in mc.categories" :key="category.id">{{
+                  category.name
+                }}</span>
               </div>
               <h3>{{ mc.title }}</h3>
               <p>Организатор: {{ mc.organizer.first_name }} {{ mc.organizer.last_name }}</p>
@@ -19,9 +23,7 @@
                 <span class="location">{{ mc.location_name }}</span>
                 <span class="date">{{ new Date(mc.start_date).toLocaleDateString() }}</span>
               </div>
-              <button class="button button--large">
-                Подробнее
-              </button>
+              <button class="button button--large">Подробнее</button>
             </div>
           </li>
         </ul>
@@ -34,48 +36,48 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
-import { useMasterClassesStore } from '@/stores/masterClasses';
-import { useSidebarStore } from '@/stores/sidebarStore';
-import SidebarToggleButton from "@/components/map/SidebarToggleButton.vue";
+import { ref, onMounted } from 'vue'
+import { useMasterClassesStore } from '@/stores/masterClasses'
+import { useSidebarStore } from '@/stores/sidebarStore'
+import SidebarToggleButton from '@/components/map/SidebarToggleButton.vue'
 
-const masterClassesStore = useMasterClassesStore();
-const sidebarStore = useSidebarStore();
-const listContainerRef = ref<HTMLDivElement | null>(null);
+const masterClassesStore = useMasterClassesStore()
+const sidebarStore = useSidebarStore()
+const listContainerRef = ref<HTMLDivElement | null>(null)
 
-const masterClasses = ref<any[]>([]);
-const perPage = 10;
-let currentPage = 1;
+const masterClasses = ref<any[]>([])
+const perPage = 10
+let currentPage = 1
 
 const loadMoreClasses = () => {
-  const start = (currentPage - 1) * perPage;
-  const end = currentPage * perPage;
-  const newClasses = masterClassesStore.masterClasses.slice(start, end);
+  const start = (currentPage - 1) * perPage
+  const end = currentPage * perPage
+  const newClasses = masterClassesStore.masterClasses.slice(start, end)
 
-  masterClasses.value = [...masterClasses.value, ...newClasses];
-  currentPage++;
-};
+  masterClasses.value = [...masterClasses.value, ...newClasses]
+  currentPage++
+}
 
 const handleScroll = () => {
-  const container = listContainerRef.value as HTMLDivElement;
+  const container = listContainerRef.value as HTMLDivElement
   if (container) {
-    const bottom = container.scrollHeight - container.scrollTop === container.clientHeight;
+    const bottom = container.scrollHeight - container.scrollTop === container.clientHeight
     if (bottom) {
-      loadMoreClasses();
+      loadMoreClasses()
     }
   }
-};
+}
 
 onMounted(() => {
   masterClassesStore.fetchMasterClasses().then(() => {
-    loadMoreClasses();
-    listContainerRef.value?.addEventListener('scroll', handleScroll);
-  });
-});
+    loadMoreClasses()
+    listContainerRef.value?.addEventListener('scroll', handleScroll)
+  })
+})
 </script>
 
 <style lang="scss" scoped>
-@import "@/assets/variables";
+@import '@/assets/variables';
 
 .sidebar-container__wrapper {
   display: flex;
@@ -93,7 +95,9 @@ onMounted(() => {
 
     .list-container {
       overflow-y: scroll;
-      transition: transform 0.3s ease-in-out, width 0.3s ease-in-out;
+      transition:
+        transform 0.3s ease-in-out,
+        width 0.3s ease-in-out;
       transform: translateX(0);
       background-color: $green;
       width: 100%;

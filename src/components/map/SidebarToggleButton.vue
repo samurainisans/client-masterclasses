@@ -2,7 +2,7 @@
 <template>
   <div class="sidebar-toggle-container">
     <button @click="toggleSidebar" aria-label="Toggle sidebar" class="sidebar-toggle">
-      <span :class="{'closed': !isOpen}">
+      <span :class="{ closed: !isOpen }">
         <div class="icon-container">
           <div class="line line1"></div>
           <div class="line line2"></div>
@@ -14,19 +14,18 @@
 </template>
 
 <script setup lang="ts">
-import { useSidebarStore } from '@/stores/sidebarStore';
+import { useSidebarStore } from '@/stores/sidebarStore'
 
-const sidebarStore = useSidebarStore();
-const { isOpen, toggle } = sidebarStore;
+const sidebarStore = useSidebarStore()
+const { isOpen, toggle } = sidebarStore
 
 const toggleSidebar = () => {
-  toggle();
-};
+  toggle()
+}
 </script>
 
 <style lang="scss" scoped>
-@import "@/assets/variables.scss";
-
+@import '@/assets/variables.scss';
 
 button {
   border: none;

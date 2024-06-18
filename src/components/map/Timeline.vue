@@ -1,66 +1,74 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue';
-import SelectComponent from '@/components/ui/SelectComponent.vue';
+import { ref, watch } from 'vue'
+import SelectComponent from '@/components/ui/SelectComponent.vue'
 
 const props = defineProps<{
-  startDate?: Date,
+  startDate?: Date
   endDate?: Date
-}>();
+}>()
 
 const emit = defineEmits<{
-  (e: 'changeData', data: { startDate: Date, interval: string, mode: string }): void
-}>();
+  (e: 'changeData', data: { startDate: Date; interval: string; mode: string }): void
+}>()
 
-const intervals = ['день', 'неделя', 'месяц'];
-const modes = ['точный период', 'накопительно'];
-const selectedInterval = ref(intervals[1]);
-const selectedMode = ref(modes[0]);
-const value = ref(0);
-const maxRange = ref(0);
+const intervals = ['день', 'неделя', 'месяц']
+const modes = ['точный период', 'накопительно']
+const selectedInterval = ref(intervals[1])
+const selectedMode = ref(modes[0])
+const value = ref(0)
+const maxRange = ref(0)
 
 function adjustSliderRange() {
-  if (!props.startDate || !props.endDate) return;
+  if (!props.startDate || !props.endDate) return
 
-  const diffTime = props.endDate.getTime() - props.startDate.getTime();
+  const diffTime = props.endDate.getTime() - props.startDate.getTime()
   switch (selectedInterval.value) {
     case 'день':
-      maxRange.value = Math.ceil(diffTime / (1000 * 3600 * 24));
-      break;
+      maxRange.value = Math.ceil(diffTime / (1000 * 3600 * 24))
+      break
     case 'неделя':
-      maxRange.value = Math.ceil(diffTime / (1000 * 3600 * 24 * 7));
-      break;
+      maxRange.value = Math.ceil(diffTime / (1000 * 3600 * 24 * 7))
+      break
     default:
-      maxRange.value = Math.ceil(diffTime / (1000 * 3600 * 24 * 30));
+      maxRange.value = Math.ceil(diffTime / (1000 * 3600 * 24 * 30))
   }
-  value.value = 0;
+  value.value = 0
 }
 
-watch([() => props.startDate, () => props.endDate, selectedInterval], adjustSliderRange, { immediate: true });
+watch([() => props.startDate, () => props.endDate, selectedInterval], adjustSliderRange, {
+  immediate: true
+})
 
 function handleChange(event: Event) {
-  const newValue = parseInt((event.target as HTMLInputElement).value, 10);
-  if (!props.startDate) return;
+  const newValue = parseInt((event.target as HTMLInputElement).value, 10)
+  if (!props.startDate) return
 
-  const newStartDate = new Date(props.startDate.getTime() + newValue * getCurrentIntervalMilliseconds());
-  emit('changeData', { startDate: newStartDate, interval: selectedInterval.value, mode: selectedMode.value });
-  updateSliderBackground(newValue);
+  const newStartDate = new Date(
+    props.startDate.getTime() + newValue * getCurrentIntervalMilliseconds()
+  )
+  emit('changeData', {
+    startDate: newStartDate,
+    interval: selectedInterval.value,
+    mode: selectedMode.value
+  })
+  updateSliderBackground(newValue)
 }
 
 function getCurrentIntervalMilliseconds() {
   switch (selectedInterval.value) {
     case 'день':
-      return 1000 * 3600 * 24;
+      return 1000 * 3600 * 24
     case 'неделя':
-      return 1000 * 3600 * 24 * 7;
+      return 1000 * 3600 * 24 * 7
     default:
-      return 1000 * 3600 * 24 * 30;
+      return 1000 * 3600 * 24 * 30
   }
 }
 
 function updateSliderBackground(value: number) {
-  const inputRange = document.querySelector('.timeline__input-range') as HTMLInputElement;
-  const percentage = (value / maxRange.value) * 100;
-  inputRange.style.setProperty('--value', `${percentage}`);
+  const inputRange = document.querySelector('.timeline__input-range') as HTMLInputElement
+  const percentage = (value / maxRange.value) * 100
+  inputRange.style.setProperty('--value', `${percentage}`)
 }
 </script>
 
@@ -71,14 +79,21 @@ function updateSliderBackground(value: number) {
       <SelectComponent :options="modes" v-model="selectedMode" />
     </div>
     <div class="timeline__slider">
-      <input type="range" :min="0" :max="maxRange" v-model="value" @input="handleChange" class="timeline__input-range"/>
+      <input
+        type="range"
+        :min="0"
+        :max="maxRange"
+        v-model="value"
+        @input="handleChange"
+        class="timeline__input-range"
+      />
     </div>
   </div>
 </template>
 
 <style scoped lang="scss">
-@import "@/assets/variables";
-@import "@/assets/select-styles";
+@import '@/assets/variables';
+@import '@/assets/select-styles';
 
 .timeline {
   display: flex;
@@ -224,9 +239,6 @@ function updateSliderBackground(value: number) {
   }
 
   .timeline__input-range {
-
   }
 }
-
-
 </style>

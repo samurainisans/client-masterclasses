@@ -20,24 +20,24 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue';
-import { useRouter } from 'vue-router';
-import { useUserStore } from '@/stores/userStore';
-import AuthGuard from "@/components/ui/permission/AuthGuard.vue";
+import { ref, computed } from 'vue'
+import { useRouter } from 'vue-router'
+import { useUserStore } from '@/stores/userStore'
+import AuthGuard from '@/components/ui/permission/AuthGuard.vue'
 
-const userStore = useUserStore();
-const user = computed(() => userStore.user);
-const router = useRouter();
+const userStore = useUserStore()
+const user = computed(() => userStore.user)
+const router = useRouter()
 
 const goToProfile = () => {
-  router.push({ name: 'Profile' });
-};
+  router.push({ name: 'Profile' })
+}
 
 const logout = () => {
-  userStore.logout();
-  userStore.isAuthenticated = false;
-  router.push({ name: 'Home' });
-};
+  userStore.logout()
+  userStore.isAuthenticated = false
+  router.push({ name: 'Home' })
+}
 </script>
 
 <style scoped lang="scss">
